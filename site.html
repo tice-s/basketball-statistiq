@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <!-- Optimisation pour les mobiles -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Statistiques des Joueurs de Basketball</title>
+  <!-- Inclusion de Font Awesome pour les icônes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papKZkCGj6t4NLBhT7LzUQKqPk6upqgQdwJpNpCcuD0AcDO+9K71BWBxvP7kYy8o32HnmY0rjgV3EdxvWnR1Mw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Inclusion de jsPDF depuis CDN pour la génération de PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    /* Palette de couleurs : Orange, blanc et noir */
+    :root {
+      --orange: #FF7F00;
+      --blanc: #FFFFFF;
+      --noir: #000000;
+    }
+    /* Styles généraux */
+    body {
+      font-family: 'Arial', sans-serif;
+      background: var(--blanc);
+      color: var(--noir);
+      margin: 0;
+      padding: 20px;
+    }
+    h1, h2 {
+      text-align: center;
+      color: var(--orange);
+    }
+    /* Formulaire de configuration de l'équipe */
+    .team-form {
+      margin-bottom: 40px;
+      background: var(--blanc);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      max-width: 800px;
+      margin: 10px auto;
+      border: 2px solid var(--orange);
+    }
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .form-row input[type="text"],
+    .form-row input[type="color"],
+    .form-row input[type="file"] {
+      padding: 8px;
+      margin-right: 10px;
+      border: 1px solid var(--noir);
+      border-radius: 4px;
+    }
+    .form-row input[type="text"] {
+      flex: 1;
+      min-width: 200px;
+    }
+    button {
+      padding: 8px 16px;
+      border: none;
+      background: var(--orange);
+      color: var(--blanc);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    button:hover {
+      background: var(--noir);
+    }
+    /* Bouton validation avec icône panier */
+    .validate-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 0 auto;
+      font-size: 1.2em;
+    }
+    /* Fiche des statistiques */
+    .stats-page {
+      display: none;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .team-stats {
+      margin-bottom: 40px;
+    }
+    .player-card {
+      background: var(--blanc);
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      padding: 10px;
+      margin: 10px;
+      flex: 1;
+      min-width: 250px;
+      border: 1px solid var(--orange);
+    }
+    .player-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .player-header img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-right: 10px;
+      border: 2px solid var(--orange);
+    }
+    .player-header h3 {
+      margin: 0;
+      font-size: 1.2em;
+      word-wrap: break-word;
+      color: var(--noir);
+    }
+    .stats {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .stat {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--orange);
+      color: var(--blanc);
+      padding: 5px 10px;
+      border-radius: 4px;
+    }
+    .stat span {
+      flex: 1;
+    }
+    .stat .counter {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .stat .counter button {
+      padding: 4px 8px;
+      font-size: 0.9em;
+      background: var(--blanc);
+      color: var(--orange);
+      border: 1px solid var(--orange);
+      border-radius: 4px;
+    }
+    /* Icônes basket-ball */
+    .basket-icons {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .basket-icons i {
+      font-size: 2em;
+      margin: 0 10px;
+      color: var(--orange);
+    }
+    /* Grille pour l'affichage des joueurs */
+    .players-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .download-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    /* Responsive : adaptation pour les écrans plus petits */
+    @media (max-width: 600px) {
+      .form-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .player-header {
+        flex-direction: column;
+      }
+      .player-header img {
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Configuration de l'Équipe</h1>
+  <form id="playerForm">
+    <!-- Saisie du nom de l'équipe et de sa couleur -->
+    <div class="team-form">
+      <h2>Nom de l'Équipe</h2>
+      <div class="form-row">
+        <input type="text" id="teamNameInput" placeholder="Entrez le nom de l'équipe" required>
+        <input type="color" id="teamColorInput" value="#FF7F00" title="Choisissez la couleur du nom de l'équipe">
+      </div>
+    </div>
+    <!-- Saisie des joueurs (5 joueurs obligatoires) -->
+    <div class="team-form">
+      <h2>Joueurs</h2>
+      <div id="playersContainer">
+        <!-- On va générer 5 lignes -->
+      </div>
+    </div>
+    <div style="text-align:center;">
+      <!-- Bouton de validation avec une icône de panier -->
+      <button type="submit" class="validate-btn">
+        <i class="fa-solid fa-basket-shopping"></i> Valider
+      </button>
+    </div>
+  </form>
+
+  <!-- Page des statistiques -->
+  <div class="stats-page" id="statsPage">
+    <h1 id="teamNameDisplay">Statistiques de l'Équipe</h1>
+    <!-- Section d'icônes de basket-ball -->
+    <div class="basket-icons">
+      <i class="fa-solid fa-basketball"></i>
+      <i class="fa-solid fa-shoe-prints"></i>
+      <i class="fa-solid fa-hand-back-fist"></i>
+    </div>
+    <div class="download-container">
+      <!-- Bouton de téléchargement avec une icône de ballon dans un panier -->
+      <button onclick="downloadPDF()">
+        <i class="fa-solid fa-basketball"></i> Télécharger le rapport PDF
+      </button>
+    </div>
+    <div class="team-stats">
+      <div class="players-container" id="playersStatsContainer"></div>
+    </div>
+  </div>
+
+  <script>
+    // Nombre de joueurs à saisir
+    const numPlayers = 12;
+    // Image par défaut si aucune image n'est fournie
+    const defaultImage = "https://via.placeholder.com/60?text=?";
+
+    // Générer les lignes d'entrée pour les joueurs
+    function generatePlayerInputs(containerId) {
+      const container = document.getElementById(containerId);
+      for (let i = 0; i < numPlayers; i++) {
+        const row = document.createElement("div");
+        row.classList.add("form-row");
+
+        // Champ pour le nom du joueur
+        const nameInput = document.createElement("input");
+        nameInput.type = "text";
+        nameInput.placeholder = "Nom du joueur " + (i + 1);
+        nameInput.required = true;
+        nameInput.classList.add("player-name");
+
+        // Champ pour l'image du joueur
+        const imageInput = document.createElement("input");
+        imageInput.type = "file";
+        imageInput.accept = "image/*";
+        imageInput.classList.add("player-image");
+
+        row.appendChild(nameInput);
+        row.appendChild(imageInput);
+        container.appendChild(row);
+      }
+    }
+
+    // Générer 5 lignes d'entrée pour les joueurs
+    generatePlayerInputs("playersContainer");
+
+    // Gestion du formulaire de configuration
+    document.getElementById("playerForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      // Récupérer le nom de l'équipe et la couleur choisie
+      const teamName = document.getElementById("teamNameInput").value.trim();
+      const teamColor = document.getElementById("teamColorInput").value;
+      // Préparer l'objet de l'équipe
+      const teamData = { teamName: teamName, teamColor: teamColor, players: [] };
+
+      // Fonction pour lire l'image en Data URL
+      function readImage(file) {
+        return new Promise((resolve) => {
+          if (!file) {
+            resolve(defaultImage);
+          } else {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      // Récupération asynchrone des données des joueurs
+      async function getPlayersData() {
+        const container = document.getElementById("playersContainer");
+        const rows = container.querySelectorAll(".form-row");
+        for (const row of rows) {
+          const name = row.querySelector(".player-name").value.trim();
+          const fileInput = row.querySelector(".player-image");
+          const file = fileInput.files[0];
+          const imageUrl = await readImage(file);
+          teamData.players.push({ name, imageUrl, stats: { points: 0, rebonds: 0, passes: 0, contres: 0, inters: 0 } });
+        }
+      }
+
+      getPlayersData().then(() => {
+        // Masquer le formulaire et afficher la page des statistiques
+        document.getElementById("playerForm").style.display = "none";
+        document.getElementById("statsPage").style.display = "block";
+        // Afficher le nom de l'équipe dans la couleur choisie
+        const teamNameDisplay = document.getElementById("teamNameDisplay");
+        teamNameDisplay.textContent = "Statistiques de l'équipe : " + teamData.teamName;
+        teamNameDisplay.style.color = teamData.teamColor;
+        renderStats(teamData);
+      });
+    });
+
+    // Fonction pour créer la fiche d'un joueur
+    function createPlayerCard(player, container) {
+      const card = document.createElement("div");
+      card.classList.add("player-card");
+
+      // En-tête avec l'image et le nom
+      const header = document.createElement("div");
+      header.classList.add("player-header");
+      const img = document.createElement("img");
+      img.src = player.imageUrl || defaultImage;
+      img.alt = player.name;
+      const nameElem = document.createElement("h3");
+      nameElem.textContent = player.name;
+      header.appendChild(img);
+      header.appendChild(nameElem);
+      card.appendChild(header);
+
+      // Création des statistiques du joueur
+      const statsDiv = document.createElement("div");
+      statsDiv.classList.add("stats");
+
+      // Liste des statistiques à afficher
+      const statList = [
+        { label: "Points", key: "points" },
+        { label: "Rebonds", key: "rebonds" },
+        { label: "Passes", key: "passes" },
+        { label: "Contres", key: "contres" },
+        { label: "Interceptions", key: "inters" }
+      ];
+
+      statList.forEach(stat => {
+        const statDiv = document.createElement("div");
+        statDiv.classList.add("stat");
+
+        const statLabel = document.createElement("span");
+        statLabel.textContent = stat.label + ": ";
+        statDiv.appendChild(statLabel);
+
+        const counterDiv = document.createElement("div");
+        counterDiv.classList.add("counter");
+
+        const minusBtn = document.createElement("button");
+        minusBtn.textContent = "-";
+        minusBtn.addEventListener("click", () => {
+          if (player.stats[stat.key] > 0) {
+            player.stats[stat.key]--;
+            statValue.textContent = player.stats[stat.key];
+          }
+        });
+        const statValue = document.createElement("span");
+        statValue.textContent = player.stats[stat.key];
+        const plusBtn = document.createElement("button");
+        plusBtn.textContent = "+";
+        plusBtn.addEventListener("click", () => {
+          player.stats[stat.key]++;
+          statValue.textContent = player.stats[stat.key];
+        });
+        counterDiv.appendChild(minusBtn);
+        counterDiv.appendChild(statValue);
+        counterDiv.appendChild(plusBtn);
+
+        statDiv.appendChild(counterDiv);
+        statsDiv.appendChild(statDiv);
+      });
+
+      card.appendChild(statsDiv);
+      container.appendChild(card);
+    }
+
+    // Fonction pour afficher les statistiques de l'équipe
+    function renderStats(teamData) {
+      const container = document.getElementById("playersStatsContainer");
+      teamData.players.forEach(player => {
+        createPlayerCard(player, container);
+      });
+      // Sauvegarder les données dans une variable globale pour le PDF
+      window.teamFinalData = teamData;
+    }
+
+    // Fonction pour télécharger le rapport en PDF avec images, limité à 2 pages maximum
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const teamData = window.teamFinalData;
+      let y = 10;
+      
+      // Personnalisation du PDF : nom de l'équipe en couleur choisie
+      doc.setFontSize(16);
+      // Conversion de la couleur hexadécimale (ex : "#FF7F00") en valeurs RGB
+      const hex = teamData.teamColor.replace("#", "");
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      doc.setTextColor(r, g, b);
+      doc.text("Rapport Final - " + teamData.teamName, 10, y);
+      y += 10;
+      doc.setFontSize(12);
+      
+      // Remise à zéro de la couleur pour les fiches des joueurs (noir)
+      doc.setTextColor(0, 0, 0);
+      
+    
+        // Ajout de l'image du joueur (20x20)
+        try {
+          doc.addImage(player.imageUrl, 'JPEG', 10, y, 20, 20);
+        } catch (error) {
+          console.error("Erreur lors de l'ajout de l'image pour " + player.name, error);
+        }
+        // Ajout du nom du joueur en noir à côté de l'image
+        doc.text("Joueur " + (index + 1) + " : " + player.name, 35, y + 10);
+        y += 25;
+        doc.text("Points: " + player.stats.points, 10, y);
+        y += 6;
+        doc.text("Rebonds: " + player.stats.rebonds, 10, y);
+        y += 6;
+        doc.text("Passes: " + player.stats.passes, 10, y);
+        y += 6;
+        doc.text("Contres: " + player.stats.contres, 10, y);
+        y += 6;
+        doc.text("Interceptions: " + player.stats.inters, 10, y);
+        y += 10;
+        
+        // Si l'espace sur la page est insuffisant et qu'on est sur moins de 2 pages, ajouter une nouvelle page
+        if (y > 250 && doc.getNumberOfPages() < 2) {
+          doc.addPage();
+          y = 10;
+        }
+      }
+      
+      doc.save(teamData.teamName + "_rapport.pdf");
+    }
+  </script>
+</body>
+</html>
