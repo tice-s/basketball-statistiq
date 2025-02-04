@@ -230,7 +230,7 @@
 
   <script>
     // Nombre de joueurs à saisir
-    const numPlayers = 12;
+    const numPlayers = 5;
     // Image par défaut si aucune image n'est fournie
     const defaultImage = "https://via.placeholder.com/60?text=?";
 
@@ -411,7 +411,16 @@
       // Remise à zéro de la couleur pour les fiches des joueurs (noir)
       doc.setTextColor(0, 0, 0);
       
-    
+      // Parcours de chaque joueur (limité à 2 pages)
+      for (let index = 0; index < teamData.players.length; index++) {
+        const player = teamData.players[index];
+        
+        // Si sur la 2ème page et espace insuffisant, tronquer le contenu
+        if (doc.getNumberOfPages() === 2 && y > 250) {
+          doc.text("Contenu tronqué...", 10, y);
+          break;
+        }
+        
         // Ajout de l'image du joueur (20x20)
         try {
           doc.addImage(player.imageUrl, 'JPEG', 10, y, 20, 20);
