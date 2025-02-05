@@ -15,7 +15,7 @@
       --blanc: #FFFFFF;
       --noir: #000000;
     }
-    /* Style global et animation de fond */
+    /* Style global */
     body {
       font-family: Arial, sans-serif;
       background: var(--blanc);
@@ -25,45 +25,48 @@
       position: relative;
       overflow-x: hidden;
     }
-    /* Fond animé : image de ballon de basket qui se déplace */
+    /* Fond de site avec effet parallax lors du scroll */
     .bg-animation {
       position: fixed;
-      top: -100px;
+      top: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 300px;
-      height: 300px;
-      background: url('https://via.placeholder.com/300?text=Basketball') no-repeat center center;
-      background-size: contain;
-      opacity: 0.2;
-      animation: moveBg 10s linear infinite;
-      pointer-events: none;
-      z-index: -1;
+      width: 100%;
+      height: 100%;
+      /* Assurez-vous que le fichier se trouve dans le dossier "images" de votre projet */
+      background: url('images/R (1).jpg') no-repeat center center;
+      background-size: cover;
+      z-index: -2;
+      transition: background-position 0.2s;
     }
-    @keyframes moveBg {
-      0%   { transform: translateX(-50%) translateY(0); }
-      50%  { transform: translateX(-50%) translateY(50px); }
-      100% { transform: translateX(-50%) translateY(0); }
+    /* Sticky header avec logo à gauche */
+    .sticky-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px 10px 10px 80px; /* espace pour le logo */
+      text-align: center;
+      z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
-    /* Menu de navigation */
-    nav {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      background: var(--orange);
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      animation: fadeIn 2s;
+    /* Conteneur pour le logo dans le header */
+    #logoContainer {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 60px;
+      height: 60px;
     }
-    nav a {
-      color: var(--blanc);
-      text-decoration: none;
-      font-weight: bold;
-      transition: color 0.3s;
+    #logoContainer img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
-    nav a:hover {
-      color: var(--noir);
+    .sticky-header h1 {
+      margin: 0;
+      font-size: 1.5em;
     }
     /* Animation fade-in */
     @keyframes fadeIn {
@@ -71,20 +74,22 @@
       to { opacity: 1; }
     }
     /* Titres */
-    h1, h2 {
+    h2 {
       text-align: center;
       color: var(--orange);
       animation: fadeIn 2s;
     }
-    /* Formulaire de configuration de l'équipe */
+    /* Formulaire de configuration avec fond semi-transparent */
     .team-form {
+      margin-top: 70px; /* espace pour le header */
       margin-bottom: 40px;
-      background: var(--blanc);
+      background: rgba(255, 255, 255, 0.8);
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
       max-width: 800px;
-      margin: 10px auto;
+      margin-left: auto;
+      margin-right: auto;
       border: 2px solid var(--orange);
       animation: fadeIn 2s;
     }
@@ -127,12 +132,14 @@
       margin: 0 auto;
       font-size: 1.2em;
     }
-    /* Page des statistiques */
+    /* Page des statistiques : fond transparent */
     .stats-page {
       display: none;
       max-width: 1200px;
       margin: auto;
       animation: fadeIn 2s;
+      margin-top: 70px;
+      background-color: transparent;
     }
     .team-stats {
       margin-bottom: 40px;
@@ -149,7 +156,7 @@
       position: relative;
       animation: fadeIn 2s;
     }
-    /* Encadrement du meilleur joueur */
+    /* Encadrement du meilleur joueur dans l'affichage web */
     .best-player {
       border: 3px solid gold;
       box-shadow: 0 0 10px gold;
@@ -181,14 +188,11 @@
     .stat {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       background: var(--orange);
       color: var(--blanc);
       padding: 5px 10px;
       border-radius: 4px;
-    }
-    .stat span {
-      flex: 1;
     }
     .stat .counter {
       display: flex;
@@ -202,6 +206,21 @@
       color: var(--orange);
       border: 1px solid var(--orange);
       border-radius: 4px;
+      cursor: pointer;
+    }
+    /* Boutons supplémentaires pour Points uniquement */
+    .stat .counter button.plus2,
+    .stat .counter button.plus3 {
+      background: #e0f7fa;
+    }
+    /* Section "Faute" affichée sous forme de cases à cocher */
+    .faute-container {
+      display: flex;
+      gap: 5px;
+    }
+    .faute-container input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
     }
     .basket-icons {
       text-align: center;
@@ -221,6 +240,34 @@
       text-align: center;
       margin-bottom: 20px;
     }
+    /* Bouton scroll-to-top */
+    .scroll-to-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--orange);
+      color: var(--blanc);
+      border: none;
+      padding: 10px 15px;
+      border-radius: 50%;
+      font-size: 1.2em;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      opacity: 0.7;
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 1000;
+    }
+    .scroll-to-top:hover {
+      opacity: 1;
+      transform: translateY(-3px);
+    }
+    /* Footer avec signature */
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: var(--noir);
+    }
     @media (max-width: 600px) {
       .form-row {
         flex-direction: column;
@@ -236,28 +283,29 @@
   </style>
 </head>
 <body>
-  <!-- Fond animé -->
+  <!-- Fond de site avec effet parallax -->
   <div class="bg-animation"></div>
+
+  <!-- Sticky header avec logo à gauche et le nom de l'équipe centré -->
+  <div class="sticky-header" id="stickyHeader">
+    <div id="logoContainer"></div>
+    <h1 id="stickyTeamName">Votre Équipe</h1>
+  </div>
   
-  <!-- Menu de navigation -->
-  <nav>
-    <a href="#home">Accueil</a>
-    <a href="#team">Équipe</a>
-    <a href="#stats">Statistiques</a>
-    <a href="#contact">Contact</a>
-  </nav>
-  
-  <h1 id="home">Configuration de l'Équipe</h1>
-  <form id="playerForm">
-    <!-- Formulaire de saisie du nom et couleur de l'équipe -->
-    <div class="team-form" id="team">
-      <h2>Nom de l'Équipe</h2>
-      <div class="form-row">
-        <input type="text" id="teamNameInput" placeholder="Entrez le nom de l'équipe" required>
-        <input type="color" id="teamColorInput" value="#FF7F00" title="Choisissez la couleur du nom de l'équipe">
-      </div>
+  <!-- Formulaire de configuration de l'équipe -->
+  <form id="playerForm" class="team-form">
+    <h2>Nom et Couleurs de l'Équipe</h2>
+    <div class="form-row">
+      <input type="text" id="teamNameInput" placeholder="Entrez le nom de l'équipe" required>
+      <input type="color" id="teamTextColorInput" value="#FF7F00" title="Choisissez la couleur du texte">
+      <input type="color" id="teamBorderColorInput" value="#000000" title="Choisissez la couleur de la bordure">
     </div>
-    <!-- Formulaire de saisie des joueurs (12 joueurs) -->
+    <!-- Upload du logo de l'équipe (facultatif) -->
+    <div class="form-row">
+      <label>Logo de l'équipe (facultatif): </label>
+      <input type="file" id="teamLogoInput" accept="image/*">
+    </div>
+    <!-- Formulaire des joueurs (12 joueurs) -->
     <div class="team-form">
       <h2>Joueurs</h2>
       <div id="playersContainer">
@@ -265,7 +313,6 @@
       </div>
     </div>
     <div style="text-align:center;">
-      <!-- Bouton validation -->
       <button type="submit" class="validate-btn">
         <i class="fa-solid fa-basket-shopping"></i> Valider
       </button>
@@ -274,7 +321,6 @@
 
   <!-- Page des statistiques -->
   <div class="stats-page" id="statsPage">
-    <h1 id="teamNameDisplay">Statistiques de l'Équipe</h1>
     <div class="basket-icons">
       <i class="fa-solid fa-basketball"></i>
       <i class="fa-solid fa-shoe-prints"></i>
@@ -290,12 +336,22 @@
     </div>
   </div>
 
+  <!-- Bouton scroll-to-top -->
+  <button class="scroll-to-top" id="scrollToTopBtn">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- Footer avec signature -->
+  <footer>
+    by TIMITE CHECK BEN IDRISS
+  </footer>
+
   <script>
-    // Nombre de joueurs à saisir (12 joueurs)
+    /* === Paramètres globaux === */
     const numPlayers = 12;
     const defaultImage = "https://via.placeholder.com/60?text=?";
 
-    // Générer les champs de saisie pour chaque joueur
+    /* --- Génération des champs de saisie pour chaque joueur --- */
     function generatePlayerInputs(containerId) {
       const container = document.getElementById(containerId);
       for (let i = 0; i < numPlayers; i++) {
@@ -320,60 +376,85 @@
     }
     generatePlayerInputs("playersContainer");
 
-    // Gestion du formulaire de configuration
-    document.getElementById("playerForm").addEventListener("submit", function(e) {
+    /* --- Lecture d'une image en Data URL --- */
+    function readImage(file) {
+      return new Promise((resolve) => {
+        if (!file) {
+          resolve(null);
+        } else {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    /* --- Gestion du formulaire de configuration --- */
+    document.getElementById("playerForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const teamName = document.getElementById("teamNameInput").value.trim();
-      const teamColor = document.getElementById("teamColorInput").value;
-      const teamData = { teamName: teamName, teamColor: teamColor, players: [] };
+      const teamTextColor = document.getElementById("teamTextColorInput").value;
+      const teamBorderColor = document.getElementById("teamBorderColorInput").value;
+      const logoFile = document.getElementById("teamLogoInput").files[0];
+      const teamLogo = await readImage(logoFile);
+      
+      const teamData = { 
+        teamName, 
+        teamTextColor, 
+        teamBorderColor,
+        logo: teamLogo,
+        players: [] 
+      };
 
-      // Fonction permettant de lire une image en Data URL
-      function readImage(file) {
-        return new Promise((resolve) => {
-          if (!file) {
-            resolve(defaultImage);
-          } else {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.readAsDataURL(file);
+      // Lecture asynchrone des données des joueurs
+      const container = document.getElementById("playersContainer");
+      const rows = container.querySelectorAll(".form-row");
+      for (const row of rows) {
+        const name = row.querySelector(".player-name").value.trim();
+        const fileInput = row.querySelector(".player-image");
+        const file = fileInput.files[0];
+        const imageUrl = await readImage(file) || defaultImage;
+        // Initialise la statistique "faute" à 0
+        teamData.players.push({ 
+          name, 
+          imageUrl, 
+          stats: { 
+            points: 0, 
+            rebonds: 0, 
+            passes: 0, 
+            contres: 0, 
+            inters: 0,
+            faute: 0
           }
         });
       }
 
-      async function getPlayersData() {
-        const container = document.getElementById("playersContainer");
-        const rows = container.querySelectorAll(".form-row");
-        for (const row of rows) {
-          const name = row.querySelector(".player-name").value.trim();
-          const fileInput = row.querySelector(".player-image");
-          const file = fileInput.files[0];
-          const imageUrl = await readImage(file);
-          teamData.players.push({ name, imageUrl, stats: { points: 0, rebonds: 0, passes: 0, contres: 0, inters: 0 } });
-        }
-      }
+      // Masquer le formulaire et afficher la page des statistiques
+      document.getElementById("playerForm").style.display = "none";
+      document.getElementById("statsPage").style.display = "block";
 
-      getPlayersData().then(() => {
-        document.getElementById("playerForm").style.display = "none";
-        document.getElementById("statsPage").style.display = "block";
-        const teamNameDisplay = document.getElementById("teamNameDisplay");
-        teamNameDisplay.textContent = "Statistiques de l'équipe : " + teamData.teamName;
-        teamNameDisplay.style.color = teamData.teamColor;
-        renderStats(teamData);
-      });
+      // Mise à jour du sticky header et affichage du logo dans le header
+      const stickyTeamName = document.getElementById("stickyTeamName");
+      stickyTeamName.textContent = teamData.teamName;
+      stickyTeamName.style.color = teamTextColor;
+      stickyTeamName.style.borderBottom = `4px solid ${teamBorderColor}`;
+      if(teamData.logo) {
+        document.getElementById("logoContainer").innerHTML = `<img src="${teamData.logo}" alt="Logo de l'équipe">`;
+      }
+      
+      renderStats(teamData);
     });
 
-    // Déterminer le meilleur joueur (ici, celui ayant le plus de points)
-    function determineBestPlayer(players) {
-      let best = null;
-      players.forEach(player => {
-        if (!best || player.stats.points > best.stats.points) {
-          best = player;
-        }
-      });
-      return best;
+    /* --- Calcul des maximums pour Points, Rebonds et Passes --- */
+    function computeMaxStats(players) {
+      return {
+        maxPoints: Math.max(...players.map(p => p.stats.points)),
+        maxRebonds: Math.max(...players.map(p => p.stats.rebonds)),
+        maxPasses: Math.max(...players.map(p => p.stats.passes))
+      };
     }
 
-    // Créer la fiche d'un joueur dans l'affichage
+    /* --- Création de la fiche d'un joueur dans l'affichage web --- */
     function createPlayerCard(player, container, bestPlayer) {
       const card = document.createElement("div");
       card.classList.add("player-card");
@@ -386,7 +467,8 @@
       img.src = player.imageUrl || defaultImage;
       img.alt = player.name;
       const nameElem = document.createElement("h3");
-      nameElem.textContent = player.name;
+      // Affichage du nom et ajout de "EXPULSER" si faute vaut 5
+      nameElem.textContent = player.name + (player.stats.faute === 5 ? " EXPULSER" : "");
       header.appendChild(img);
       header.appendChild(nameElem);
       card.appendChild(header);
@@ -394,12 +476,13 @@
       const statsDiv = document.createElement("div");
       statsDiv.classList.add("stats");
 
+      // Liste des statistiques existantes
       const statList = [
-        { label: "Points", key: "points" },
-        { label: "Rebonds", key: "rebonds" },
-        { label: "Passes", key: "passes" },
-        { label: "Contres", key: "contres" },
-        { label: "Interceptions", key: "inters" }
+        { label: "Points", key: "points", multi: true },
+        { label: "Rebonds", key: "rebonds", multi: false },
+        { label: "Passes", key: "passes", multi: false },
+        { label: "Contres", key: "contres", multi: false },
+        { label: "Interceptions", key: "inters", multi: false }
       ];
 
       statList.forEach(stat => {
@@ -414,36 +497,97 @@
         counterDiv.classList.add("counter");
 
         const minusBtn = document.createElement("button");
-        minusBtn.textContent = "-";
+        minusBtn.textContent = "–";
         minusBtn.addEventListener("click", () => {
           if (player.stats[stat.key] > 0) {
             player.stats[stat.key]--;
             statValue.textContent = player.stats[stat.key];
+            updateBestPlayerHighlight();
           }
         });
+        counterDiv.appendChild(minusBtn);
+
         const statValue = document.createElement("span");
         statValue.textContent = player.stats[stat.key];
-        const plusBtn = document.createElement("button");
-        plusBtn.textContent = "+";
-        plusBtn.addEventListener("click", () => {
-          player.stats[stat.key]++;
-          statValue.textContent = player.stats[stat.key];
-          // Mettre à jour l'encadrement du meilleur joueur si besoin
-          updateBestPlayerHighlight();
-        });
-        counterDiv.appendChild(minusBtn);
         counterDiv.appendChild(statValue);
-        counterDiv.appendChild(plusBtn);
 
+        if (stat.multi) {
+          const plus1 = document.createElement("button");
+          plus1.textContent = "+1";
+          plus1.addEventListener("click", () => {
+            player.stats[stat.key] += 1;
+            statValue.textContent = player.stats[stat.key];
+            updateBestPlayerHighlight();
+          });
+          counterDiv.appendChild(plus1);
+
+          const plus2 = document.createElement("button");
+          plus2.textContent = "+2";
+          plus2.classList.add("plus2");
+          plus2.addEventListener("click", () => {
+            player.stats[stat.key] += 2;
+            statValue.textContent = player.stats[stat.key];
+            updateBestPlayerHighlight();
+          });
+          counterDiv.appendChild(plus2);
+
+          const plus3 = document.createElement("button");
+          plus3.textContent = "+3";
+          plus3.classList.add("plus3");
+          plus3.addEventListener("click", () => {
+            player.stats[stat.key] += 3;
+            statValue.textContent = player.stats[stat.key];
+            updateBestPlayerHighlight();
+          });
+          counterDiv.appendChild(plus3);
+        } else {
+          const plus1 = document.createElement("button");
+          plus1.textContent = "+1";
+          plus1.addEventListener("click", () => {
+            player.stats[stat.key] += 1;
+            statValue.textContent = player.stats[stat.key];
+            updateBestPlayerHighlight();
+          });
+          counterDiv.appendChild(plus1);
+        }
         statDiv.appendChild(counterDiv);
         statsDiv.appendChild(statDiv);
       });
+
+      // Ajout de la statistique "Faute" sous forme de cases à cocher
+      const fauteDiv = document.createElement("div");
+      fauteDiv.classList.add("stat");
+      const fauteLabel = document.createElement("span");
+      fauteLabel.textContent = "Faute: ";
+      fauteDiv.appendChild(fauteLabel);
+      const faultContainer = document.createElement("div");
+      faultContainer.classList.add("faute-container");
+      // Créer 5 cases à cocher pour la faute
+      for (let i = 0; i < 5; i++) {
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.classList.add("faute-cb");
+        // Cochez la case si i < player.stats.faute
+        cb.checked = (player.stats.faute > i);
+        cb.addEventListener("change", function() {
+          const checkboxes = faultContainer.querySelectorAll(".faute-cb");
+          let count = 0;
+          checkboxes.forEach(chk => {
+            if (chk.checked) count++;
+          });
+          player.stats.faute = count;
+          updateBestPlayerHighlight();
+        });
+        faultContainer.appendChild(cb);
+      }
+      fauteDiv.appendChild(faultContainer);
+      statsDiv.appendChild(fauteDiv);
 
       card.appendChild(statsDiv);
       container.appendChild(card);
     }
 
-    // Afficher les statistiques de l'équipe
+    /* --- Affichage des statistiques de l'équipe --- */
     function renderStats(teamData) {
       const container = document.getElementById("playersStatsContainer");
       container.innerHTML = "";
@@ -454,7 +598,7 @@
       window.teamFinalData = teamData;
     }
 
-    // Mise à jour de l'encadrement du meilleur joueur après modification des stats
+    /* --- Mise à jour de l'affichage après modification des stats --- */
     function updateBestPlayerHighlight() {
       const teamData = window.teamFinalData;
       const container = document.getElementById("playersStatsContainer");
@@ -465,76 +609,139 @@
       });
     }
 
-    // Génération du rapport PDF avec affichage de 2 joueurs par ligne
+    /* --- Détermine le meilleur joueur (celui ayant le plus de points) --- */
+    function determineBestPlayer(players) {
+      return players.reduce((prev, curr) =>
+        prev.stats.points >= curr.stats.points ? prev : curr
+      );
+    }
+
+    /* --- Génération du rapport PDF ---
+          - La première partie affiche les fiches de joueurs en 2 colonnes pour tous les joueurs.
+          - Pour chaque fiche, le nom est affiché, et si le joueur a 5 fautes, " EXPULSER" est ajouté juste après le nom.
+          - Toutes les statistiques (Points, Rebonds, Passes, Contres, Interceptions, Faute) sont affichées.
+          - Des bordures sont tracées pour les maximums : Points max en rouge, Rebonds max en orange, Passes max en noir.
+          - Le logo (s'il est fourni) est ajouté au pied de la dernière page de la première partie, avec une légende en petit.
+          - La deuxième page a été supprimée ; toutes les informations sont intégrées de manière alignée.
+    --- */
     function downloadPDF() {
       const { jsPDF } = window.jspdf;
-      // Création d'un PDF en format A4
       const doc = new jsPDF('p', 'pt', 'a4');
       const teamData = window.teamFinalData;
       const margin = 40;
-      let x = margin;
       let y = margin;
       const pageWidth = doc.internal.pageSize.getWidth();
       const colWidth = (pageWidth - margin * 2) / 2;
+      const imageW = 40, imageH = 40;
+      const cellHeight = 160; // Augmentation de la hauteur pour plus d'aération
       
-      // Titre du rapport avec la couleur choisie
-      doc.setFontSize(16);
-      const hex = teamData.teamColor.replace("#", "");
-      const r = parseInt(hex.substring(0, 2), 16);
-      const g = parseInt(hex.substring(2, 4), 16);
-      const b = parseInt(hex.substring(4, 6), 16);
-      doc.setTextColor(r, g, b);
-      doc.text("Rapport Final - " + teamData.teamName, margin, y);
-      y += 30;
+      // Calcul des maximums pour Points, Rebonds et Passes
+      const { maxPoints, maxRebonds, maxPasses } = computeMaxStats(teamData.players);
+      
+      // Titre du rapport (centré)
+      doc.setFontSize(18);
+      const hex = teamData.teamTextColor.replace("#", "");
+      const rColor = parseInt(hex.substring(0, 2), 16);
+      const gColor = parseInt(hex.substring(2, 4), 16);
+      const bColor = parseInt(hex.substring(4, 6), 16);
+      doc.setTextColor(rColor, gColor, bColor);
+      doc.text(teamData.teamName, pageWidth/2, y, { align: 'center' });
+      y += 40;
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
-
-      // Identifier le meilleur joueur
-      const bestPlayer = determineBestPlayer(teamData.players);
-
-      // Parcourir les joueurs 2 par 2
+      
+      // Affichage des fiches de joueurs en 2 colonnes
       for (let i = 0; i < teamData.players.length; i += 2) {
         for (let col = 0; col < 2; col++) {
           const index = i + col;
           if (index >= teamData.players.length) break;
           const player = teamData.players[index];
-          let currentX = margin + col * colWidth;
+          const currentX = margin + col * colWidth;
           let currentY = y;
-          // Ajout de l'image du joueur (40x40)
+          const centerX = currentX + (colWidth - imageW) / 2;
           try {
-            doc.addImage(player.imageUrl, 'JPEG', currentX, currentY, 40, 40);
+            doc.addImage(player.imageUrl, 'JPEG', centerX, currentY, imageW, imageH);
           } catch (error) {
-            console.error("Erreur lors de l'ajout de l'image pour " + player.name, error);
+            console.error("Erreur pour " + player.name, error);
           }
-          doc.text("Joueur: " + player.name, currentX + 50, currentY + 20);
-          currentY += 45;
-          doc.text("Points: " + player.stats.points, currentX, currentY);
+          currentY += imageH + 10;
+          // Affichage du nom ; si 5 fautes, ajouter " EXPULSER" après le nom
+          const nameText = player.name + (player.stats.faute === 5 ? " EXPULSER" : "");
+          doc.text("Joueur: " + nameText, currentX + colWidth/2, currentY, { align: 'center' });
           currentY += 15;
-          doc.text("Rebonds: " + player.stats.rebonds, currentX, currentY);
+          doc.text("Points: " + player.stats.points, currentX + colWidth/2, currentY, { align: 'center' });
           currentY += 15;
-          doc.text("Passes: " + player.stats.passes, currentX, currentY);
+          doc.text("Rebonds: " + player.stats.rebonds, currentX + colWidth/2, currentY, { align: 'center' });
           currentY += 15;
-          doc.text("Contres: " + player.stats.contres, currentX, currentY);
+          doc.text("Passes: " + player.stats.passes, currentX + colWidth/2, currentY, { align: 'center' });
           currentY += 15;
-          doc.text("Interceptions: " + player.stats.inters, currentX, currentY);
-
-          // Si c'est le meilleur joueur, encadrer sa fiche en or
-          if (player === bestPlayer) {
-            doc.setDrawColor(255, 215, 0); // Couleur or
+          doc.text("Contres: " + player.stats.contres, currentX + colWidth/2, currentY, { align: 'center' });
+          currentY += 15;
+          doc.text("Interceptions: " + player.stats.inters, currentX + colWidth/2, currentY, { align: 'center' });
+          currentY += 15;
+          doc.text("Faute: " + player.stats.faute, currentX + colWidth/2, currentY, { align: 'center' });
+          
+          // Tracer les bordures pour les maximums
+          if (player.stats.points === maxPoints) {
+            doc.setDrawColor(255, 0, 0);
             doc.setLineWidth(2);
-            doc.rect(currentX - 5, y - 5, colWidth - 10, currentY - y + 20);
+            doc.rect(currentX - 5, y - 5, colWidth + 10, cellHeight + 10);
+          }
+          if (player.stats.rebonds === maxRebonds) {
+            doc.setDrawColor(255, 165, 0);
+            doc.setLineWidth(2);
+            doc.rect(currentX - 10, y - 10, colWidth + 20, cellHeight + 20);
+          }
+          if (player.stats.passes === maxPasses) {
             doc.setDrawColor(0, 0, 0);
+            doc.setLineWidth(2);
+            doc.rect(currentX - 15, y - 15, colWidth + 30, cellHeight + 30);
           }
         }
-        y += 130;
-        // Passage à une nouvelle page si l'espace est insuffisant
-        if (y > doc.internal.pageSize.getHeight() - margin - 100 && i + 2 < teamData.players.length) {
+        y += cellHeight + 10;  // espace entre lignes
+        if (y > doc.internal.pageSize.getHeight() - margin - cellHeight && i + 2 < teamData.players.length) {
           doc.addPage();
           y = margin;
         }
       }
+      
+      // Ajout du logo au pied de la dernière page de la première partie, s'il est fourni, avec légende en petit
+      if (teamData.logo) {
+        const logoW = 80, logoH = 80;
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const logoX = pageWidth - margin - logoW;
+        const logoY = pageHeight - margin - logoH;
+        try {
+          doc.addImage(teamData.logo, 'JPEG', logoX, logoY, logoW, logoH);
+        } catch (error) {
+          console.error("Erreur lors de l'ajout du logo", error);
+        }
+        doc.setFontSize(8);
+        doc.setTextColor(0, 0, 0);
+        const legendX = logoX - 10;
+        const legendY = logoY + logoH/2 - 12;
+        doc.text("Légende:", legendX, legendY, { align: 'right' });
+        doc.text("Points max: Rouge", legendX, legendY + 10, { align: 'right' });
+        doc.text("Rebonds max: Orange", legendX, legendY + 20, { align: 'right' });
+        doc.text("Passes max: Noir", legendX, legendY + 30, { align: 'right' });
+      }
+      
+      // Ici, nous n'ajoutons pas de deuxième page séparée.
+      
       doc.save(teamData.teamName + "_rapport.pdf");
     }
+
+    /* --- Bouton scroll-to-top --- */
+    const scrollBtn = document.getElementById("scrollToTopBtn");
+    scrollBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    /* --- Effet parallax sur le fond lors du scroll --- */
+    window.addEventListener('scroll', function() {
+      const scrollY = window.pageYOffset;
+      document.querySelector('.bg-animation').style.backgroundPosition = 'center ' + (scrollY * 0.5) + 'px';
+    });
   </script>
 </body>
 </html>
