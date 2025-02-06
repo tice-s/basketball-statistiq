@@ -4,9 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Statistiques des Joueurs de Basketball</title>
-  <!-- Inclusion de Font Awesome pour les icônes -->
+  <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Inclusion de jsPDF depuis CDN pour la génération de PDF -->
+  <!-- Google Fonts pour une police moderne -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <!-- jsPDF pour la génération de PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     /* Palette de couleurs */
@@ -14,48 +18,109 @@
       --orange: #FF7F00;
       --blanc: #FFFFFF;
       --noir: #000000;
+      --bg-light: #f0f0f0;
+      --bg-dark: #121212;
+      --text-light: #000000;
+      --text-dark: #ffffff;
     }
-    /* Style global */
+    /* Style global et transition */
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Poppins', Arial, sans-serif;
       background: var(--blanc);
       color: var(--noir);
       margin: 0;
       padding: 20px;
-      position: relative;
       overflow-x: hidden;
+      transition: background 0.5s, color 0.5s;
     }
-    /* Fond de site avec effet parallax lors du scroll */
-    .bg-animation {
+    body.dark-mode {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+    /* Spinner de chargement */
+    #spinner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2000;
+    }
+    #spinner .loader {
+      border: 8px solid var(--bg-light);
+      border-top: 8px solid var(--orange);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Parallaxe sur les images de fond */
+    .bg-container {
       position: fixed;
       top: 0;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
       height: 100%;
-      /* Assurez-vous que le fichier se trouve dans le dossier "images" de votre projet */
-      background: url('images/R (1).jpg') no-repeat center center;
-      background-size: cover;
-      z-index: -2;
-      transition: background-position 0.2s;
+      overflow: hidden;
+      z-index: -3;
     }
-    /* Sticky header avec logo à gauche */
+    .bg-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: calc(100% - 20px);
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      /* Effet zoom et filtre pour dynamiser */
+      animation: zoom 20s ease-in-out infinite;
+      filter: brightness(0.9);
+      transition: filter 0.5s;
+    }
+    .bg-image:hover {
+      filter: brightness(1) blur(1px);
+    }
+    .bg-image.image1 {
+      background: url('images/R (1).jpg') no-repeat center center;
+    }
+    .bg-image.image2 {
+      background: url('images/R2.jpg') no-repeat center center;
+      left: 20px;
+      opacity: 0.8;
+    }
+    @keyframes zoom {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    /* Parallaxe JS : modifie la position des images lors du scroll */
+    .parallax {
+      transform: translateY(calc(var(--scroll) * 0.3));
+    }
+    /* Sticky header */
     .sticky-header {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       background: rgba(255, 255, 255, 0.9);
-      padding: 10px 10px 10px 80px; /* espace pour le logo */
-      text-align: center;
+      padding: 10px 10px;
       z-index: 1000;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.5s, color 0.5s;
     }
-    /* Conteneur pour le logo dans le header */
+    body.dark-mode .sticky-header {
+      background: rgba(0, 0, 0, 0.9);
+    }
+    /* Logo */
     #logoContainer {
-      position: absolute;
-      top: 10px;
-      left: 10px;
       width: 60px;
       height: 60px;
     }
@@ -64,14 +129,65 @@
       height: 100%;
       object-fit: cover;
     }
-    .sticky-header h1 {
+    /* Zone centrale pour nom et bouton mode */
+    .header-center {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-center h1 {
       margin: 0;
       font-size: 1.5em;
     }
-    /* Animation fade-in */
+    /* Bouton mode (petit et à droite du nom) */
+    #modeToggle {
+      background: none;
+      border: none;
+      font-size: 1.2em;
+      cursor: pointer;
+      color: var(--orange);
+      transition: transform 0.3s, color 0.3s;
+    }
+    #modeToggle:hover {
+      transform: scale(1.2);
+      color: var(--noir);
+    }
+    /* Tooltips personnalisées pour les boutons d'action */
+    .stats-actions button {
+      position: relative;
+    }
+    .stats-actions button::after {
+      content: attr(title);
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--orange);
+      color: var(--blanc);
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 0.8em;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      white-space: nowrap;
+    }
+    .stats-actions button:hover::after {
+      opacity: 1;
+    }
+    /* Animations fadeIn et iconPulse */
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
+    }
+    @keyframes iconPulse {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .animated-icon {
+      animation: iconPulse 2s infinite;
+      transition: transform 0.5s, color 0.5s;
     }
     /* Titres */
     h2 {
@@ -79,9 +195,9 @@
       color: var(--orange);
       animation: fadeIn 2s;
     }
-    /* Formulaire de configuration avec fond semi-transparent */
+    /* Formulaire */
     .team-form {
-      margin-top: 70px; /* espace pour le header */
+      margin-top: 80px;
       margin-bottom: 40px;
       background: rgba(255, 255, 255, 0.8);
       padding: 20px;
@@ -92,6 +208,11 @@
       margin-right: auto;
       border: 2px solid var(--orange);
       animation: fadeIn 2s;
+      transition: background 0.5s, border-color 0.5s;
+    }
+    body.dark-mode .team-form {
+      background: rgba(20, 20, 20, 0.9);
+      border-color: var(--orange);
     }
     .form-row {
       display: flex;
@@ -106,6 +227,7 @@
       margin-right: 10px;
       border: 1px solid var(--noir);
       border-radius: 4px;
+      transition: border-color 0.3s;
     }
     .form-row input[type="text"] {
       flex: 1;
@@ -119,31 +241,47 @@
       border-radius: 4px;
       cursor: pointer;
       font-size: 1em;
-      transition: background 0.3s;
+      transition: background 0.3s, transform 0.3s;
     }
     button:hover {
       background: var(--noir);
+      transform: scale(1.05);
     }
-    .validate-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin: 0 auto;
-      font-size: 1.2em;
-    }
-    /* Page des statistiques : fond transparent */
+    /* Page des statistiques */
     .stats-page {
       display: none;
       max-width: 1200px;
       margin: auto;
       animation: fadeIn 2s;
-      margin-top: 70px;
+      margin-top: 80px;
       background-color: transparent;
+      position: relative;
     }
-    .team-stats {
-      margin-bottom: 40px;
+    /* Zone des actions */
+    .stats-actions {
+      text-align: center;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
+    .stats-actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      outline: none;
+    }
+    .stats-actions button i {
+      font-size: 1.5em;
+      color: var(--orange);
+      transition: transform 0.5s, color 0.5s;
+    }
+    .stats-actions button i:hover {
+      transform: scale(1.2);
+      color: var(--noir);
+    }
+    /* Cartes joueurs avec hover */
     .player-card {
       background: var(--blanc);
       border-radius: 8px;
@@ -155,8 +293,16 @@
       border: 1px solid var(--orange);
       position: relative;
       animation: fadeIn 2s;
+      transition: transform 0.3s, box-shadow 0.3s;
     }
-    /* Encadrement du meilleur joueur dans l'affichage web */
+    .player-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    body.dark-mode .player-card {
+      background: #1e1e1e;
+      border-color: var(--orange);
+    }
     .best-player {
       border: 3px solid gold;
       box-shadow: 0 0 10px gold;
@@ -179,6 +325,9 @@
       font-size: 1.2em;
       word-wrap: break-word;
       color: var(--noir);
+    }
+    body.dark-mode .player-header h3 {
+      color: var(--text-dark);
     }
     .stats {
       display: flex;
@@ -208,12 +357,11 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    /* Boutons supplémentaires pour Points uniquement */
     .stat .counter button.plus2,
     .stat .counter button.plus3 {
       background: #e0f7fa;
     }
-    /* Section "Faute" affichée sous forme de cases à cocher */
+    /* Faute sous forme de cases */
     .faute-container {
       display: flex;
       gap: 5px;
@@ -221,24 +369,6 @@
     .faute-container input[type="checkbox"] {
       width: 20px;
       height: 20px;
-    }
-    .basket-icons {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .basket-icons i {
-      font-size: 2em;
-      margin: 0 10px;
-      color: var(--orange);
-    }
-    .players-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .download-container {
-      text-align: center;
-      margin-bottom: 20px;
     }
     /* Bouton scroll-to-top */
     .scroll-to-top {
@@ -261,12 +391,42 @@
       opacity: 1;
       transform: translateY(-3px);
     }
-    /* Footer avec signature */
+    /* Footer */
     footer {
       text-align: center;
       margin-top: 40px;
       font-size: 0.9em;
       color: var(--noir);
+    }
+    /* Prévisualisation simplifiée */
+    #playersPreviewContainer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    #playersPreviewContainer .preview-card {
+      flex: 0 0 calc(33.33% - 20px);
+      background: var(--blanc);
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      padding: 10px;
+      text-align: center;
+    }
+    #playersPreviewContainer .preview-card img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 8px;
+    }
+    #playersPreviewContainer .preview-card h3 {
+      margin: 5px 0;
+      font-size: 1em;
+    }
+    #playersPreviewContainer .preview-card .stat-value {
+      font-size: 0.9em;
+      margin: 3px 0;
     }
     @media (max-width: 600px) {
       .form-row {
@@ -279,20 +439,42 @@
       .player-header img {
         margin-bottom: 10px;
       }
+      .stats-actions {
+        flex-direction: column;
+        gap: 20px;
+      }
+      #playersPreviewContainer .preview-card {
+        flex: 0 0 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Fond de site avec effet parallax -->
-  <div class="bg-animation"></div>
+  <!-- Spinner de chargement -->
+  <div id="spinner">
+    <div class="loader"></div>
+  </div>
 
-  <!-- Sticky header avec logo à gauche et le nom de l'équipe centré -->
+  <!-- Conteneur des fonds d'écran -->
+  <div class="bg-container">
+    <div class="bg-image image1" id="bg1"></div>
+    <div class="bg-image image2" id="bg2"></div>
+  </div>
+
+  <!-- Sticky header -->
   <div class="sticky-header" id="stickyHeader">
-    <div id="logoContainer"></div>
-    <h1 id="stickyTeamName">Votre Équipe</h1>
+    <div id="logoContainer">
+      <img src="images/ST_BS-removebg-preview.png" alt="Logo par défaut">
+    </div>
+    <div class="header-center">
+      <h1 id="stickyTeamName">Votre Équipe</h1>
+      <button id="modeToggle" title="Changer de mode">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+    </div>
   </div>
   
-  <!-- Formulaire de configuration de l'équipe -->
+  <!-- Formulaire de configuration -->
   <form id="playerForm" class="team-form">
     <h2>Nom et Couleurs de l'Équipe</h2>
     <div class="form-row">
@@ -300,21 +482,19 @@
       <input type="color" id="teamTextColorInput" value="#FF7F00" title="Choisissez la couleur du texte">
       <input type="color" id="teamBorderColorInput" value="#000000" title="Choisissez la couleur de la bordure">
     </div>
-    <!-- Upload du logo de l'équipe (facultatif) -->
     <div class="form-row">
       <label>Logo de l'équipe (facultatif): </label>
       <input type="file" id="teamLogoInput" accept="image/*">
     </div>
-    <!-- Formulaire des joueurs (12 joueurs) -->
     <div class="team-form">
       <h2>Joueurs</h2>
       <div id="playersContainer">
-        <!-- Les champs de saisie pour 12 joueurs seront générés ici -->
+        <!-- Génération des champs pour 12 joueurs -->
       </div>
     </div>
     <div style="text-align:center;">
       <button type="submit" class="validate-btn">
-        <i class="fa-solid fa-basket-shopping"></i> Valider
+        <i class="fa-solid fa-basketball"></i> Valider
       </button>
     </div>
   </form>
@@ -322,17 +502,35 @@
   <!-- Page des statistiques -->
   <div class="stats-page" id="statsPage">
     <div class="basket-icons">
-      <i class="fa-solid fa-basketball"></i>
-      <i class="fa-solid fa-shoe-prints"></i>
-      <i class="fa-solid fa-hand-back-fist"></i>
+      <i class="fa-solid fa-basketball animated-icon"></i>
+      <i class="fa-solid fa-shoe-prints animated-icon"></i>
+      <i class="fa-solid fa-hand-back-fist animated-icon"></i>
     </div>
-    <div class="download-container">
-      <button onclick="downloadPDF()">
-        <i class="fa-solid fa-basketball"></i> Télécharger le rapport PDF
+    <!-- Actions (icônes) -->
+    <div class="stats-actions">
+      <button id="previewBtn" title="Prévisualiser">
+        <i class="fa-solid fa-eye animated-icon"></i>
+      </button>
+      <button id="downloadBtn" title="Télécharger PDF">
+        <i class="fa-solid fa-download animated-icon"></i>
+      </button>
+      <button id="backBtn" title="Retour">
+        <i class="fa-solid fa-arrow-left animated-icon"></i>
       </button>
     </div>
     <div class="team-stats">
       <div class="players-container" id="playersStatsContainer"></div>
+    </div>
+  </div>
+
+  <!-- Modal de prévisualisation simplifiée -->
+  <div id="previewModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" id="closeModal">&times;</span>
+      <h2>Aperçu des statistiques</h2>
+      <div class="team-stats">
+        <div class="players-container" id="playersPreviewContainer"></div>
+      </div>
     </div>
   </div>
 
@@ -341,34 +539,46 @@
     <i class="fa-solid fa-arrow-up"></i>
   </button>
 
-  <!-- Footer avec signature -->
+  <!-- Footer -->
   <footer>
     by TIMITE CHECK BEN IDRISS
   </footer>
 
   <script>
-    /* === Paramètres globaux === */
+    /* --- Gestion du spinner de chargement --- */
+    window.addEventListener("load", () => {
+      document.getElementById("spinner").style.display = "none";
+    });
+
+    /* --- Parallaxe sur les images de fond --- */
+    window.addEventListener("scroll", () => {
+      let scrollPos = window.pageYOffset;
+      // Ajustement de la position (les deux images se déplacent différemment)
+      document.getElementById("bg1").style.transform = `translateY(${scrollPos * 0.3}px) scale(1)`;
+      document.getElementById("bg2").style.transform = `translateY(${scrollPos * 0.2}px) scale(1)`;
+      // Vous pouvez également ajuster le filtre (ex. augmentation du flou lors du scroll)
+      // document.getElementById("bg1").style.filter = `blur(${scrollPos/500}px)`;
+    });
+
+    /* --- Paramètres globaux --- */
     const numPlayers = 12;
     const defaultImage = "https://via.placeholder.com/60?text=?";
 
-    /* --- Génération des champs de saisie pour chaque joueur --- */
+    /* --- Génération des champs pour chaque joueur --- */
     function generatePlayerInputs(containerId) {
       const container = document.getElementById(containerId);
       for (let i = 0; i < numPlayers; i++) {
         const row = document.createElement("div");
         row.classList.add("form-row");
-
         const nameInput = document.createElement("input");
         nameInput.type = "text";
         nameInput.placeholder = "Nom du joueur " + (i + 1);
         nameInput.required = true;
         nameInput.classList.add("player-name");
-
         const imageInput = document.createElement("input");
         imageInput.type = "file";
         imageInput.accept = "image/*";
         imageInput.classList.add("player-image");
-
         row.appendChild(nameInput);
         row.appendChild(imageInput);
         container.appendChild(row);
@@ -379,9 +589,8 @@
     /* --- Lecture d'une image en Data URL --- */
     function readImage(file) {
       return new Promise((resolve) => {
-        if (!file) {
-          resolve(null);
-        } else {
+        if (!file) { resolve(null); }
+        else {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result);
           reader.readAsDataURL(file);
@@ -389,7 +598,7 @@
       });
     }
 
-    /* --- Gestion du formulaire de configuration --- */
+    /* --- Gestion du formulaire --- */
     document.getElementById("playerForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const teamName = document.getElementById("teamNameInput").value.trim();
@@ -397,7 +606,6 @@
       const teamBorderColor = document.getElementById("teamBorderColorInput").value;
       const logoFile = document.getElementById("teamLogoInput").files[0];
       const teamLogo = await readImage(logoFile);
-      
       const teamData = { 
         teamName, 
         teamTextColor, 
@@ -405,8 +613,6 @@
         logo: teamLogo,
         players: [] 
       };
-
-      // Lecture asynchrone des données des joueurs
       const container = document.getElementById("playersContainer");
       const rows = container.querySelectorAll(".form-row");
       for (const row of rows) {
@@ -414,26 +620,14 @@
         const fileInput = row.querySelector(".player-image");
         const file = fileInput.files[0];
         const imageUrl = await readImage(file) || defaultImage;
-        // Initialise la statistique "faute" à 0
         teamData.players.push({ 
           name, 
           imageUrl, 
-          stats: { 
-            points: 0, 
-            rebonds: 0, 
-            passes: 0, 
-            contres: 0, 
-            inters: 0,
-            faute: 0
-          }
+          stats: { points: 0, rebonds: 0, passes: 0, contres: 0, inters: 0, faute: 0 }
         });
       }
-
-      // Masquer le formulaire et afficher la page des statistiques
       document.getElementById("playerForm").style.display = "none";
       document.getElementById("statsPage").style.display = "block";
-
-      // Mise à jour du sticky header et affichage du logo dans le header
       const stickyTeamName = document.getElementById("stickyTeamName");
       stickyTeamName.textContent = teamData.teamName;
       stickyTeamName.style.color = teamTextColor;
@@ -441,11 +635,10 @@
       if(teamData.logo) {
         document.getElementById("logoContainer").innerHTML = `<img src="${teamData.logo}" alt="Logo de l'équipe">`;
       }
-      
       renderStats(teamData);
     });
 
-    /* --- Calcul des maximums pour Points, Rebonds et Passes --- */
+    /* --- Calcul des maximums --- */
     function computeMaxStats(players) {
       return {
         maxPoints: Math.max(...players.map(p => p.stats.points)),
@@ -454,29 +647,23 @@
       };
     }
 
-    /* --- Création de la fiche d'un joueur dans l'affichage web --- */
+    /* --- Création d'une fiche joueur (avec modification) --- */
     function createPlayerCard(player, container, bestPlayer) {
       const card = document.createElement("div");
       card.classList.add("player-card");
-      if (player === bestPlayer) {
-        card.classList.add("best-player");
-      }
+      if (player === bestPlayer) { card.classList.add("best-player"); }
       const header = document.createElement("div");
       header.classList.add("player-header");
       const img = document.createElement("img");
       img.src = player.imageUrl || defaultImage;
       img.alt = player.name;
       const nameElem = document.createElement("h3");
-      // Affichage du nom et ajout de "EXPULSER" si faute vaut 5
       nameElem.textContent = player.name + (player.stats.faute === 5 ? " EXPULSER" : "");
       header.appendChild(img);
       header.appendChild(nameElem);
       card.appendChild(header);
-
       const statsDiv = document.createElement("div");
       statsDiv.classList.add("stats");
-
-      // Liste des statistiques existantes
       const statList = [
         { label: "Points", key: "points", multi: true },
         { label: "Rebonds", key: "rebonds", multi: false },
@@ -484,18 +671,14 @@
         { label: "Contres", key: "contres", multi: false },
         { label: "Interceptions", key: "inters", multi: false }
       ];
-
       statList.forEach(stat => {
         const statDiv = document.createElement("div");
         statDiv.classList.add("stat");
-
         const statLabel = document.createElement("span");
         statLabel.textContent = stat.label + ": ";
         statDiv.appendChild(statLabel);
-
         const counterDiv = document.createElement("div");
         counterDiv.classList.add("counter");
-
         const minusBtn = document.createElement("button");
         minusBtn.textContent = "–";
         minusBtn.addEventListener("click", () => {
@@ -506,11 +689,9 @@
           }
         });
         counterDiv.appendChild(minusBtn);
-
         const statValue = document.createElement("span");
         statValue.textContent = player.stats[stat.key];
         counterDiv.appendChild(statValue);
-
         if (stat.multi) {
           const plus1 = document.createElement("button");
           plus1.textContent = "+1";
@@ -520,7 +701,6 @@
             updateBestPlayerHighlight();
           });
           counterDiv.appendChild(plus1);
-
           const plus2 = document.createElement("button");
           plus2.textContent = "+2";
           plus2.classList.add("plus2");
@@ -530,7 +710,6 @@
             updateBestPlayerHighlight();
           });
           counterDiv.appendChild(plus2);
-
           const plus3 = document.createElement("button");
           plus3.textContent = "+3";
           plus3.classList.add("plus3");
@@ -553,8 +732,6 @@
         statDiv.appendChild(counterDiv);
         statsDiv.appendChild(statDiv);
       });
-
-      // Ajout de la statistique "Faute" sous forme de cases à cocher
       const fauteDiv = document.createElement("div");
       fauteDiv.classList.add("stat");
       const fauteLabel = document.createElement("span");
@@ -562,19 +739,15 @@
       fauteDiv.appendChild(fauteLabel);
       const faultContainer = document.createElement("div");
       faultContainer.classList.add("faute-container");
-      // Créer 5 cases à cocher pour la faute
       for (let i = 0; i < 5; i++) {
         const cb = document.createElement("input");
         cb.type = "checkbox";
         cb.classList.add("faute-cb");
-        // Cochez la case si i < player.stats.faute
         cb.checked = (player.stats.faute > i);
         cb.addEventListener("change", function() {
           const checkboxes = faultContainer.querySelectorAll(".faute-cb");
           let count = 0;
-          checkboxes.forEach(chk => {
-            if (chk.checked) count++;
-          });
+          checkboxes.forEach(chk => { if (chk.checked) count++; });
           player.stats.faute = count;
           updateBestPlayerHighlight();
         });
@@ -582,7 +755,6 @@
       }
       fauteDiv.appendChild(faultContainer);
       statsDiv.appendChild(fauteDiv);
-
       card.appendChild(statsDiv);
       container.appendChild(card);
     }
@@ -592,38 +764,89 @@
       const container = document.getElementById("playersStatsContainer");
       container.innerHTML = "";
       const bestPlayer = determineBestPlayer(teamData.players);
-      teamData.players.forEach(player => {
-        createPlayerCard(player, container, bestPlayer);
-      });
+      teamData.players.forEach(player => { createPlayerCard(player, container, bestPlayer); });
       window.teamFinalData = teamData;
     }
 
-    /* --- Mise à jour de l'affichage après modification des stats --- */
+    /* --- Mise à jour de l'affichage --- */
     function updateBestPlayerHighlight() {
       const teamData = window.teamFinalData;
       const container = document.getElementById("playersStatsContainer");
       container.innerHTML = "";
       const bestPlayer = determineBestPlayer(teamData.players);
-      teamData.players.forEach(player => {
-        createPlayerCard(player, container, bestPlayer);
-      });
+      teamData.players.forEach(player => { createPlayerCard(player, container, bestPlayer); });
     }
 
-    /* --- Détermine le meilleur joueur (celui ayant le plus de points) --- */
+    /* --- Détermine le meilleur joueur --- */
     function determineBestPlayer(players) {
-      return players.reduce((prev, curr) =>
-        prev.stats.points >= curr.stats.points ? prev : curr
-      );
+      return players.reduce((prev, curr) => prev.stats.points >= curr.stats.points ? prev : curr);
     }
 
-    /* --- Génération du rapport PDF ---
-          - La première partie affiche les fiches de joueurs en 2 colonnes pour tous les joueurs.
-          - Pour chaque fiche, le nom est affiché, et si le joueur a 5 fautes, " EXPULSER" est ajouté juste après le nom.
-          - Toutes les statistiques (Points, Rebonds, Passes, Contres, Interceptions, Faute) sont affichées.
-          - Des bordures sont tracées pour les maximums : Points max en rouge, Rebonds max en orange, Passes max en noir.
-          - Le logo (s'il est fourni) est ajouté au pied de la dernière page de la première partie, avec une légende en petit.
-          - La deuxième page a été supprimée ; toutes les informations sont intégrées de manière alignée.
-    --- */
+    /* --- Création d'une fiche de prévisualisation simplifiée --- */
+    function createPreviewCard(player) {
+      const card = document.createElement("div");
+      card.classList.add("preview-card");
+      const header = document.createElement("div");
+      header.classList.add("player-header");
+      const img = document.createElement("img");
+      img.src = player.imageUrl || defaultImage;
+      img.alt = player.name;
+      header.appendChild(img);
+      const nameElem = document.createElement("h3");
+      nameElem.textContent = player.name + (player.stats.faute === 5 ? " EXPULSER" : "");
+      header.appendChild(nameElem);
+      card.appendChild(header);
+      const stats = document.createElement("div");
+      stats.classList.add("stat-values");
+      const statList = [
+        { label: "Points", key: "points" },
+        { label: "Rebonds", key: "rebonds" },
+        { label: "Passes", key: "passes" },
+        { label: "Contres", key: "contres" },
+        { label: "Interceptions", key: "inters" },
+        { label: "Faute", key: "faute" }
+      ];
+      statList.forEach(stat => {
+        const statElem = document.createElement("div");
+        statElem.classList.add("stat-value");
+        statElem.textContent = stat.label + ": " + player.stats[stat.key];
+        stats.appendChild(statElem);
+      });
+      card.appendChild(stats);
+      return card;
+    }
+
+    /* --- Bouton scroll-to-top --- */
+    const scrollBtn = document.getElementById("scrollToTopBtn");
+    scrollBtn.addEventListener("click", () => { window.scrollTo({ top: 0, behavior: "smooth" }); });
+
+    /* --- Bouton Retour --- */
+    document.getElementById("backBtn").addEventListener("click", () => {
+      document.getElementById("statsPage").style.display = "none";
+      document.getElementById("playerForm").style.display = "block";
+    });
+
+    /* --- Aperçu modal simplifié --- */
+    document.getElementById("previewBtn").addEventListener("click", () => {
+      const previewContainer = document.getElementById("playersPreviewContainer");
+      previewContainer.innerHTML = "";
+      const teamData = window.teamFinalData;
+      teamData.players.forEach(player => {
+        const card = createPreviewCard(player);
+        previewContainer.appendChild(card);
+      });
+      document.getElementById("previewModal").style.display = "block";
+    });
+    document.getElementById("closeModal").addEventListener("click", () => {
+      document.getElementById("previewModal").style.display = "none";
+    });
+    window.addEventListener("click", (event) => {
+      if (event.target == document.getElementById("previewModal")) {
+        document.getElementById("previewModal").style.display = "none";
+      }
+    });
+
+    /* --- Génération du PDF --- */
     function downloadPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('p', 'pt', 'a4');
@@ -633,12 +856,8 @@
       const pageWidth = doc.internal.pageSize.getWidth();
       const colWidth = (pageWidth - margin * 2) / 2;
       const imageW = 40, imageH = 40;
-      const cellHeight = 160; // Augmentation de la hauteur pour plus d'aération
-      
-      // Calcul des maximums pour Points, Rebonds et Passes
+      const cellHeight = 160;
       const { maxPoints, maxRebonds, maxPasses } = computeMaxStats(teamData.players);
-      
-      // Titre du rapport (centré)
       doc.setFontSize(18);
       const hex = teamData.teamTextColor.replace("#", "");
       const rColor = parseInt(hex.substring(0, 2), 16);
@@ -649,8 +868,6 @@
       y += 40;
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
-      
-      // Affichage des fiches de joueurs en 2 colonnes
       for (let i = 0; i < teamData.players.length; i += 2) {
         for (let col = 0; col < 2; col++) {
           const index = i + col;
@@ -665,7 +882,6 @@
             console.error("Erreur pour " + player.name, error);
           }
           currentY += imageH + 10;
-          // Affichage du nom ; si 5 fautes, ajouter " EXPULSER" après le nom
           const nameText = player.name + (player.stats.faute === 5 ? " EXPULSER" : "");
           doc.text("Joueur: " + nameText, currentX + colWidth/2, currentY, { align: 'center' });
           currentY += 15;
@@ -680,8 +896,6 @@
           doc.text("Interceptions: " + player.stats.inters, currentX + colWidth/2, currentY, { align: 'center' });
           currentY += 15;
           doc.text("Faute: " + player.stats.faute, currentX + colWidth/2, currentY, { align: 'center' });
-          
-          // Tracer les bordures pour les maximums
           if (player.stats.points === maxPoints) {
             doc.setDrawColor(255, 0, 0);
             doc.setLineWidth(2);
@@ -698,14 +912,12 @@
             doc.rect(currentX - 15, y - 15, colWidth + 30, cellHeight + 30);
           }
         }
-        y += cellHeight + 10;  // espace entre lignes
+        y += cellHeight + 10;
         if (y > doc.internal.pageSize.getHeight() - margin - cellHeight && i + 2 < teamData.players.length) {
           doc.addPage();
           y = margin;
         }
       }
-      
-      // Ajout du logo au pied de la dernière page de la première partie, s'il est fourni, avec légende en petit
       if (teamData.logo) {
         const logoW = 80, logoH = 80;
         const pageHeight = doc.internal.pageSize.getHeight();
@@ -725,23 +937,22 @@
         doc.text("Rebonds max: Orange", legendX, legendY + 20, { align: 'right' });
         doc.text("Passes max: Noir", legendX, legendY + 30, { align: 'right' });
       }
-      
-      // Ici, nous n'ajoutons pas de deuxième page séparée.
-      
       doc.save(teamData.teamName + "_rapport.pdf");
     }
 
-    /* --- Bouton scroll-to-top --- */
-    const scrollBtn = document.getElementById("scrollToTopBtn");
-    scrollBtn.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    /* --- Bascule mode sombre/jour --- */
+    const modeToggle = document.getElementById("modeToggle");
+    modeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+      if(document.body.classList.contains("dark-mode")) {
+        modeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+      } else {
+        modeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+      }
     });
-
-    /* --- Effet parallax sur le fond lors du scroll --- */
-    window.addEventListener('scroll', function() {
-      const scrollY = window.pageYOffset;
-      document.querySelector('.bg-animation').style.backgroundPosition = 'center ' + (scrollY * 0.5) + 'px';
-    });
+    
+    /* --- Écouteur pour le bouton de téléchargement --- */
+    document.getElementById("downloadBtn").addEventListener("click", downloadPDF);
   </script>
 </body>
 </html>
