@@ -2,957 +2,798 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Statistiques des Joueurs de Basketball</title>
-  <!-- Font Awesome pour les icônes -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts pour une police moderne -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <!-- jsPDF pour la génération de PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photographe Pro - Capturing Moments</title>
+  <!-- Importation des polices -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    /* Palette de couleurs */
+    /* ========================== */
+    /* Variables CSS pour la palette de couleurs */
     :root {
-      --orange: #FF7F00;
-      --blanc: #FFFFFF;
-      --noir: #000000;
-      --bg-light: #f0f0f0;
-      --bg-dark: #121212;
-      --text-light: #000000;
-      --text-dark: #ffffff;
+      --primary-color: #c80000;
+      --primary-hover: #a30000;
+      --secondary-color: #e60000;
+      --bg-light: #fafafa;
+      --bg-dark: #000;
+      --text-color: #333;
+      --text-inverse: #fff;
     }
-    /* Style global et transition */
+    
+    /* ========================== */
+    /* Réinitialisation & Scroll Smooth */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
     body {
-      font-family: 'Poppins', Arial, sans-serif;
-      background: var(--blanc);
-      color: var(--noir);
-      margin: 0;
-      padding: 20px;
+      font-family: 'Raleway', sans-serif;
+      background-color: #fff;
+      color: var(--text-color);
       overflow-x: hidden;
-      transition: background 0.5s, color 0.5s;
+      line-height: 1.6;
     }
-    body.dark-mode {
-      background: var(--bg-dark);
-      color: var(--text-dark);
+    h1, h2, h3 {
+      font-family: 'Playfair Display', serif;
     }
-    /* Spinner de chargement */
-    #spinner {
+    
+    /* ========================== */
+    /* Logo toujours visible */
+    .logo {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 2000;
-    }
-    #spinner .loader {
-      border: 8px solid var(--bg-light);
-      border-top: 8px solid var(--orange);
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    /* Parallaxe sur les images de fond */
-    .bg-container {
-      position: fixed;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: -3;
-    }
-    .bg-image {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: calc(100% - 20px);
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-      /* Effet zoom et filtre pour dynamiser */
-      animation: zoom 20s ease-in-out infinite;
-      filter: brightness(0.9);
-      transition: filter 0.5s;
-    }
-    .bg-image:hover {
-      filter: brightness(1) blur(1px);
-    }
-    .bg-image.image1 {
-      background: url('images/R (1).jpg') no-repeat center center;
-    }
-    .bg-image.image2 {
-      background: url('images/R2.jpg') no-repeat center center;
+      top: 20px;
       left: 20px;
-      opacity: 0.8;
+      z-index: 999;
+      width: 100px;
+      animation: slideDown 1s ease-in-out;
     }
-    @keyframes zoom {
-      0%   { transform: scale(1); }
-      50%  { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-    /* Parallaxe JS : modifie la position des images lors du scroll */
-    .parallax {
-      transform: translateY(calc(var(--scroll) * 0.3));
-    }
-    /* Sticky header */
-    .sticky-header {
+    
+    /* ========================== */
+    /* Menu Hamburger */
+    .menu-toggle {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 10px 10px;
+      top: 20px;
+      right: 20px;
       z-index: 1000;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: background 0.5s, color 0.5s;
-    }
-    body.dark-mode .sticky-header {
-      background: rgba(0, 0, 0, 0.9);
-    }
-    /* Logo */
-    #logoContainer {
-      width: 60px;
-      height: 60px;
-    }
-    #logoContainer img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    /* Zone centrale pour nom et bouton mode */
-    .header-center {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .header-center h1 {
-      margin: 0;
-      font-size: 1.5em;
-    }
-    /* Bouton mode (petit et à droite du nom) */
-    #modeToggle {
-      background: none;
-      border: none;
-      font-size: 1.2em;
       cursor: pointer;
-      color: var(--orange);
-      transition: transform 0.3s, color 0.3s;
-    }
-    #modeToggle:hover {
-      transform: scale(1.2);
-      color: var(--noir);
-    }
-    /* Tooltips personnalisées pour les boutons d'action */
-    .stats-actions button {
-      position: relative;
-    }
-    .stats-actions button::after {
-      content: attr(title);
-      position: absolute;
-      bottom: -25px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--orange);
-      color: var(--blanc);
-      padding: 3px 6px;
-      border-radius: 4px;
-      font-size: 0.8em;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-      white-space: nowrap;
-    }
-    .stats-actions button:hover::after {
-      opacity: 1;
-    }
-    /* Animations fadeIn et iconPulse */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes iconPulse {
-      0%   { transform: scale(1); }
-      50%  { transform: scale(1.2); }
-      100% { transform: scale(1); }
-    }
-    .animated-icon {
-      animation: iconPulse 2s infinite;
-      transition: transform 0.5s, color 0.5s;
-    }
-    /* Titres */
-    h2 {
-      text-align: center;
-      color: var(--orange);
-      animation: fadeIn 2s;
-    }
-    /* Formulaire */
-    .team-form {
-      margin-top: 80px;
-      margin-bottom: 40px;
-      background: rgba(255, 255, 255, 0.8);
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-      border: 2px solid var(--orange);
-      animation: fadeIn 2s;
-      transition: background 0.5s, border-color 0.5s;
-    }
-    body.dark-mode .team-form {
-      background: rgba(20, 20, 20, 0.9);
-      border-color: var(--orange);
-    }
-    .form-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .form-row input[type="text"],
-    .form-row input[type="color"],
-    .form-row input[type="file"] {
-      padding: 8px;
-      margin-right: 10px;
-      border: 1px solid var(--noir);
-      border-radius: 4px;
-      transition: border-color 0.3s;
-    }
-    .form-row input[type="text"] {
-      flex: 1;
-      min-width: 200px;
-    }
-    button {
-      padding: 8px 16px;
+      font-size: 1.8rem;
+      color: var(--text-inverse);
+      background-color: var(--primary-color);
       border: none;
-      background: var(--orange);
-      color: var(--blanc);
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1em;
+      padding: 10px;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+    }
+    .menu-toggle:hover {
+      transform: scale(1.1);
+    }
+    .nav-menu {
+      position: fixed;
+      top: 70px;
+      right: 20px;
+      background-color: var(--primary-color);
+      border-radius: 5px;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      z-index: 990;
+    }
+    .nav-menu a {
+      color: var(--text-inverse);
+      text-decoration: none;
+      padding: 15px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
       transition: background 0.3s, transform 0.3s;
     }
-    button:hover {
-      background: var(--noir);
+    .nav-menu a:last-child {
+      border-bottom: none;
+    }
+    .nav-menu a:hover {
+      background-color: var(--primary-hover);
       transform: scale(1.05);
     }
-    /* Page des statistiques */
-    .stats-page {
-      display: none;
-      max-width: 1200px;
-      margin: auto;
-      animation: fadeIn 2s;
-      margin-top: 80px;
-      background-color: transparent;
-      position: relative;
+    .nav-menu a i {
+      margin-right: 5px;
+      transition: transform 0.3s;
     }
-    /* Zone des actions */
-    .stats-actions {
-      text-align: center;
-      margin-bottom: 20px;
-      display: flex;
-      gap: 30px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .stats-actions button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      outline: none;
-    }
-    .stats-actions button i {
-      font-size: 1.5em;
-      color: var(--orange);
-      transition: transform 0.5s, color 0.5s;
-    }
-    .stats-actions button i:hover {
+    .nav-menu a:hover i {
       transform: scale(1.2);
-      color: var(--noir);
     }
-    /* Cartes joueurs avec hover */
-    .player-card {
-      background: var(--blanc);
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      padding: 10px;
-      margin: 10px;
-      flex: 1;
-      min-width: 250px;
-      border: 1px solid var(--orange);
-      position: relative;
-      animation: fadeIn 2s;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .player-card:hover {
-      transform: scale(1.02);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
-    body.dark-mode .player-card {
-      background: #1e1e1e;
-      border-color: var(--orange);
-    }
-    .best-player {
-      border: 3px solid gold;
-      box-shadow: 0 0 10px gold;
-    }
-    .player-header {
+    
+    /* ========================== */
+    /* Header / Accueil avec fondu & zoom */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)),
+                  url('photographer-bg.jpg') center/cover no-repeat;
+      /* Remplacez l'URL par votre image de fond */
+      height: 100vh;
       display: flex;
       align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      animation: fadeZoom 1.5s ease-in-out;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(200, 0, 0, 0.4);
+    }
+    .header-content {
+      z-index: 1;
+      color: var(--text-inverse);
+      padding: 0 20px;
+      animation: slideUp 1.5s ease-in-out;
+    }
+    .header-content h1 {
+      font-size: 3rem;
       margin-bottom: 10px;
     }
-    .player-header img {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 50%;
-      margin-right: 10px;
-      border: 2px solid var(--orange);
+    .header-content p {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
     }
-    .player-header h3 {
-      margin: 0;
-      font-size: 1.2em;
-      word-wrap: break-word;
-      color: var(--noir);
+    .header-content blockquote {
+      font-style: italic;
+      font-size: 1.2rem;
+      margin-top: 20px;
+      border-left: 3px solid var(--text-inverse);
+      padding-left: 15px;
     }
-    body.dark-mode .player-header h3 {
-      color: var(--text-dark);
+    
+    /* ========================== */
+    /* Tarifs */
+    .pricing {
+      padding: 80px 20px;
+      background-color: #fff;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
     }
-    .stats {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    .pricing h2 {
+      margin-bottom: 40px;
     }
-    .stat {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--orange);
-      color: var(--blanc);
-      padding: 5px 10px;
-      border-radius: 4px;
+    .price-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
-    .stat .counter {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .stat .counter button {
-      padding: 4px 8px;
-      font-size: 0.9em;
-      background: var(--blanc);
-      color: var(--orange);
-      border: 1px solid var(--orange);
-      border-radius: 4px;
+    .price-card {
+      background: #fafafa;
+      padding: 20px;
+      border: 2px solid var(--primary-color);
+      border-radius: 10px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
+      position: relative;
+      overflow: hidden;
     }
-    .stat .counter button.plus2,
-    .stat .counter button.plus3 {
-      background: #e0f7fa;
+    .price-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 30px rgba(200, 0, 0, 0.2);
     }
-    /* Faute sous forme de cases */
-    .faute-container {
+    .price-card i {
+      font-size: 2rem;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      transition: transform 0.3s;
+    }
+    .price-card:hover i {
+      transform: scale(1.1);
+    }
+    .price-card h3 {
+      margin-bottom: 10px;
+    }
+    .price-card .price {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+    .price-card ul {
+      list-style: none;
+      margin-bottom: 10px;
+    }
+    .price-card ul li {
+      margin: 5px 0;
+    }
+    .price-card button {
+      background-color: var(--primary-color);
+      color: var(--text-inverse);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .price-card button i {
+      margin-right: 5px;
+    }
+    .price-card button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+    /* Animation "shutter" pour simuler le clic photo */
+    .price-card.flash {
+      animation: shutter 0.5s ease-out;
+    }
+    @keyframes shutter {
+      0% { filter: brightness(1); transform: scale(1); }
+      50% { filter: brightness(2); transform: scale(1.05); }
+      100% { filter: brightness(1); transform: scale(1); }
+    }
+    /* Affichage des infos en fondu */
+    .more-info {
+      display: none;
+      background-color: #f1f1f1;
+      color: var(--text-color);
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    /* ========================== */
+    /* Portfolio */
+    .portfolio {
+      padding: 80px 20px;
+      background-color: #f5f5f5;
+      animation: fadeIn 1s ease-in-out;
+    }
+    .portfolio h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .portfolio-filters {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .portfolio-filters button {
+      background-color: var(--primary-color);
+      color: var(--text-inverse);
+      border: none;
+      padding: 10px 20px;
+      margin: 0 5px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .portfolio-filters button:hover {
+      background-color: var(--primary-hover);
+      transform: scale(1.05);
+    }
+    .portfolio-filters button i {
+      margin-right: 5px;
+      transition: transform 0.3s;
+    }
+    .portfolio-filters button:hover i {
+      transform: scale(1.2);
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .portfolio-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      background: var(--bg-dark);
+      /* Par défaut, Studio & Dehors en format carré */
+      aspect-ratio: 1 / 1;
+      transition: transform 0.3s;
+    }
+    /* Option "Tous" : vidéo de taille réduite */
+    .portfolio-item[data-category="video"] {
+      aspect-ratio: 4 / 3;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    /* Option Événement : format paysage réduit */
+    .portfolio-item[data-category="evenement"] {
+      aspect-ratio: 16 / 9;
+    }
+    /* Diaporama pour Studio / Dehors */
+    .portfolio-item .slideshow {
       display: flex;
-      gap: 5px;
+      width: 300%; /* 3 images */
+      height: 100%;
+      transition: transform 0.5s ease-in-out;
     }
-    .faute-container input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
+    .portfolio-item .slideshow img {
+      width: calc(100% / 3);
+      height: 100%;
+      object-fit: cover;
     }
-    /* Bouton scroll-to-top */
-    .scroll-to-top {
+    .portfolio-item:hover .slideshow {
+      animation: slide 3s infinite;
+    }
+    /* Pour items simples (vidéo ou image statique) */
+    .portfolio-item img,
+    .portfolio-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .portfolio-item:hover img,
+    .portfolio-item:hover video {
+      transform: scale(1.05);
+    }
+    @keyframes slide {
+      0%   { transform: translateX(0%); }
+      33%  { transform: translateX(-33.33%); }
+      66%  { transform: translateX(-66.66%); }
+      100% { transform: translateX(0%); }
+    }
+    
+    /* ========================== */
+    /* Me Contacter */
+    .contact {
+      padding: 80px 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: var(--text-inverse);
+      animation: fadeIn 1s ease-in-out;
+    }
+    .contact h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .contact-form {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      animation: slideUp 1s ease-in-out;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    input, select {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid var(--text-inverse);
+      border-radius: 5px;
+      margin-top: 5px;
+      background: transparent;
+      color: var(--text-inverse);
+    }
+    ::placeholder {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    button.submit-btn {
+      background-color: var(--text-inverse);
+      color: var(--primary-color);
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.3s;
+    }
+    button.submit-btn i {
+      margin-right: 5px;
+    }
+    button.submit-btn:hover {
+      background-color: #eee;
+      transform: translateY(-2px);
+    }
+    
+    /* ========================== */
+    /* Vos Avis - Témoignages */
+    .testimonials {
+      padding: 80px 20px;
+      background-color: var(--bg-light);
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+    .testimonials h2 {
+      margin-bottom: 40px;
+    }
+    .testimonial-slider {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .testimonial {
+      display: none;
+      padding: 20px;
+      font-style: italic;
+      transition: opacity 0.5s ease-in-out;
+    }
+    .testimonial.active {
+      display: block;
+    }
+    .testimonial p {
+      margin-bottom: 10px;
+    }
+    .testimonial .author {
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    /* ========================== */
+    /* Animations globales */
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes slideUp {
+      0% { transform: translateY(50px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes slideDown {
+      0% { transform: translateY(-50px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes fadeZoom {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    
+    /* ========================== */
+    /* Sélecteur de palette de couleurs */
+    .color-picker {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: var(--orange);
-      color: var(--blanc);
-      border: none;
-      padding: 10px 15px;
-      border-radius: 50%;
-      font-size: 1.2em;
-      cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-      opacity: 0.7;
-      transition: opacity 0.3s, transform 0.3s;
-      z-index: 1000;
-    }
-    .scroll-to-top:hover {
-      opacity: 1;
-      transform: translateY(-3px);
-    }
-    /* Footer */
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      font-size: 0.9em;
-      color: var(--noir);
-    }
-    /* Prévisualisation simplifiée */
-    #playersPreviewContainer {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-    }
-    #playersPreviewContainer .preview-card {
-      flex: 0 0 calc(33.33% - 20px);
-      background: var(--blanc);
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1001;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #ccc;
       padding: 10px;
-      text-align: center;
+      border-radius: 5px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
     }
-    #playersPreviewContainer .preview-card img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 8px;
+    .color-picker label {
+      font-size: 0.9rem;
+      margin-right: 5px;
+      color: var(--text-color);
     }
-    #playersPreviewContainer .preview-card h3 {
-      margin: 5px 0;
-      font-size: 1em;
+    .color-picker select {
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
     }
-    #playersPreviewContainer .preview-card .stat-value {
-      font-size: 0.9em;
-      margin: 3px 0;
-    }
-    @media (max-width: 600px) {
-      .form-row {
-        flex-direction: column;
-        align-items: stretch;
+    
+    /* ========================== */
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .price-cards {
+        grid-template-columns: 1fr;
       }
-      .player-header {
-        flex-direction: column;
+      .logo {
+        width: 80px;
       }
-      .player-header img {
-        margin-bottom: 10px;
+      .header-content h1 {
+        font-size: 2.5rem;
       }
-      .stats-actions {
-        flex-direction: column;
-        gap: 20px;
-      }
-      #playersPreviewContainer .preview-card {
-        flex: 0 0 100%;
+      .header-content p, 
+      .header-content blockquote {
+        font-size: 1rem;
       }
     }
   </style>
 </head>
 <body>
-  <!-- Spinner de chargement -->
-  <div id="spinner">
-    <div class="loader"></div>
-  </div>
-
-  <!-- Conteneur des fonds d'écran -->
-  <div class="bg-container">
-    <div class="bg-image image1" id="bg1"></div>
-    <div class="bg-image image2" id="bg2"></div>
-  </div>
-
-  <!-- Sticky header -->
-  <div class="sticky-header" id="stickyHeader">
-    <div id="logoContainer">
-      <img src="images/ST_BS-removebg-preview.png" alt="Logo par défaut">
+  <!-- Icône Menu -->
+  <button class="menu-toggle"><i class="fas fa-ellipsis-v"></i></button>
+  <nav class="nav-menu">
+    <a href="#home"><i class="fas fa-home"></i> Accueil</a>
+    <a href="#pricing"><i class="fas fa-tags"></i> Tarifs</a>
+    <a href="#portfolio"><i class="fas fa-images"></i> Portfolio</a>
+    <a href="#contact"><i class="fas fa-envelope"></i> Me Contacter</a>
+  </nav>
+  
+  <!-- Logo toujours visible -->
+  <img src="logo.png" alt="Logo Photographe" class="logo">  <!-- Remplacez "logo.png" par l'URL de votre logo -->
+  
+  <!-- Header / Accueil -->
+  <header class="header" id="home">
+    <div class="header-content">
+      <h1>Photographe Professionnel</h1>
+      <p>Capturer vos moments précieux</p>
+      <blockquote>"La photographie, c'est l'art de saisir l'instant, de figer l'émotion et de raconter une histoire en une image."</blockquote>
+      <!-- Vous pouvez ajouter ici d'autres images ou vidéos -->
     </div>
-    <div class="header-center">
-      <h1 id="stickyTeamName">Votre Équipe</h1>
-      <button id="modeToggle" title="Changer de mode">
-        <i class="fa-solid fa-moon"></i>
-      </button>
+  </header>
+  
+  <!-- Tarifs -->
+  <section class="pricing" id="pricing">
+    <h2>Nos Tarifs</h2>
+    <div class="price-cards">
+      <!-- Carte Basic -->
+      <div class="price-card">
+        <i class="fas fa-camera"></i>
+        <h3>Basic</h3>
+        <p class="price">200€/session</p>
+        <ul>
+          <li>2h de shooting</li>
+          <li>20 photos retouchées</li>
+          <li>Livraison numérique</li>
+        </ul>
+        <button class="toggle-info"><i class="fas fa-info-circle"></i> En savoir plus</button>
+        <div class="more-info">
+          <p>La formule Basic vous offre l'essentiel pour capturer vos moments en toute simplicité.</p>
+        </div>
+      </div>
+      <!-- Carte Premium -->
+      <div class="price-card">
+        <i class="fas fa-video"></i>
+        <h3>Premium</h3>
+        <p class="price">400€/session</p>
+        <ul>
+          <li>4h de shooting</li>
+          <li>50 photos retouchées</li>
+          <li>1 vidéo montée</li>
+        </ul>
+        <button class="toggle-info"><i class="fas fa-info-circle"></i> En savoir plus</button>
+        <div class="more-info">
+          <p>La formule Premium inclut une séance prolongée avec plus de créativité et un montage vidéo personnalisé.</p>
+        </div>
+      </div>
+      <!-- Carte VIP -->
+      <div class="price-card">
+        <i class="fas fa-star"></i>
+        <h3>VIP</h3>
+        <p class="price">600€/session</p>
+        <ul>
+          <li>Journée complète</li>
+          <li>100+ photos retouchées</li>
+          <li>Vidéo professionnelle</li>
+        </ul>
+        <button class="toggle-info"><i class="fas fa-info-circle"></i> En savoir plus</button>
+        <div class="more-info">
+          <p>La formule VIP vous offre une expérience complète pour immortaliser chaque instant d'une journée exceptionnelle.</p>
+        </div>
+      </div>
     </div>
+  </section>
+  
+  <!-- Portfolio -->
+  <section class="portfolio" id="portfolio">
+    <h2>Portfolio</h2>
+    <!-- Sous-menu des filtres -->
+    <div class="portfolio-filters">
+      <!-- Option "Tous" : une seule vidéo, de taille réduite -->
+      <button data-filter="video"><i class="fas fa-video"></i> Tous</button>
+      <button data-filter="studio"><i class="fas fa-portrait"></i> En Studio</button>
+      <button data-filter="dehors"><i class="fas fa-tree"></i> Dehors</button>
+      <button data-filter="evenement"><i class="fas fa-calendar-alt"></i> Événement</button>
+    </div>
+    <div class="grid-container">
+      <!-- Item "Tous" (vidéo) -->
+      <div class="portfolio-item" data-category="video">
+        <video controls>
+          <source src="video-presentation.mp4" type="video/mp4">
+          Votre navigateur ne supporte pas la vidéo.
+        </video>
+      </div>
+      <!-- Items En Studio (diaporama) -->
+      <div class="portfolio-item" data-category="studio">
+        <div class="slideshow">
+          <img src="studio1-1.jpg" alt="Studio 1">
+          <img src="studio1-2.jpg" alt="Studio 1">
+          <img src="studio1-3.jpg" alt="Studio 1">
+        </div>
+      </div>
+      <div class="portfolio-item" data-category="studio">
+        <div class="slideshow">
+          <img src="studio2-1.jpg" alt="Studio 2">
+          <img src="studio2-2.jpg" alt="Studio 2">
+          <img src="studio2-3.jpg" alt="Studio 2">
+        </div>
+      </div>
+      <div class="portfolio-item" data-category="studio">
+        <div class="slideshow">
+          <img src="studio3-1.jpg" alt="Studio 3">
+          <img src="studio3-2.jpg" alt="Studio 3">
+          <img src="studio3-3.jpg" alt="Studio 3">
+        </div>
+      </div>
+      <div class="portfolio-item" data-category="studio">
+        <div class="slideshow">
+          <img src="studio4-1.jpg" alt="Studio 4">
+          <img src="studio4-2.jpg" alt="Studio 4">
+          <img src="studio4-3.jpg" alt="Studio 4">
+        </div>
+      </div>
+      <!-- Items Dehors (diaporama) -->
+      <div class="portfolio-item" data-category="dehors">
+        <div class="slideshow">
+          <img src="dehors1-1.jpg" alt="Dehors 1">
+          <img src="dehors1-2.jpg" alt="Dehors 1">
+          <img src="dehors1-3.jpg" alt="Dehors 1">
+        </div>
+      </div>
+      <div class="portfolio-item" data-category="dehors">
+        <div class="slideshow">
+          <img src="dehors2-1.jpg" alt="Dehors 2">
+          <img src="dehors2-2.jpg" alt="Dehors 2">
+          <img src="dehors2-3.jpg" alt="Dehors 2">
+        </div>
+      </div>
+      <div class="portfolio-item" data-category="dehors">
+        <div class="slideshow">
+          <img src="dehors3-1.jpg" alt="Dehors 3">
+          <img src="dehors3-2.jpg" alt="Dehors 3">
+          <img src="dehors3-3.jpg" alt="Dehors 3">
+        </div>
+      </div>
+      <div class="portfolio-item" data-category="dehors">
+        <div class="slideshow">
+          <img src="dehors4-1.jpg" alt="Dehors 4">
+          <img src="dehors4-2.jpg" alt="Dehors 4">
+          <img src="dehors4-3.jpg" alt="Dehors 4">
+        </div>
+      </div>
+      <!-- Items Événement (format paysage réduit) -->
+      <div class="portfolio-item" data-category="evenement">
+        <img src="evenement1.jpg" alt="Événement 1">
+      </div>
+      <div class="portfolio-item" data-category="evenement">
+        <img src="evenement2.jpg" alt="Événement 2">
+      </div>
+    </div>
+  </section>
+  
+  <!-- Me Contacter -->
+  <section class="contact" id="contact">
+    <h2>Me Contacter</h2>
+    <form class="contact-form" id="contactForm">
+      <div class="form-group">
+        <input type="text" name="nom" placeholder="Nom" required>
+      </div>
+      <div class="form-group">
+        <input type="text" name="prenom" placeholder="Prénom" required>
+      </div>
+      <div class="form-group">
+        <input type="tel" name="numero" placeholder="Numéro à contacter" required>
+      </div>
+      <div class="form-group">
+        <select name="tarif" required>
+          <option value="">Choisir un tarif</option>
+          <option>Basic</option>
+          <option>Premium</option>
+          <option>VIP</option>
+        </select>
+      </div>
+      <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Envoyer</button>
+    </form>
+  </section>
+  
+  <!-- Vos Avis - Témoignages -->
+  <section class="testimonials" id="testimonials">
+    <h2>Vos Avis</h2>
+    <div class="testimonial-slider">
+      <!-- Témoignage 1 -->
+      <div class="testimonial active">
+        <p>"Un service exceptionnel, des photos magnifiques qui racontent une histoire !"</p>
+        <div class="author">— M. Dupont</div>
+      </div>
+      <!-- Témoignage 2 -->
+      <div class="testimonial">
+        <p>"J'ai adoré l'expérience. L'équipe est professionnelle et passionnée."</p>
+        <div class="author">— Mme Martin</div>
+      </div>
+      <!-- Témoignage 3 -->
+      <div class="testimonial">
+        <p>"Des clichés d'une qualité incroyable et une ambiance chaleureuse lors de la séance."</p>
+        <div class="author">— M. Lemoine</div>
+      </div>
+      <!-- Témoignage 4 -->
+      <div class="testimonial">
+        <p>"Je recommande vivement pour immortaliser vos moments les plus précieux !"</p>
+        <div class="author">— Mme Moreau</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Sélecteur de palette de couleurs -->
+  <div class="color-picker">
+    <label for="colorSelect">Palette :</label>
+    <select id="colorSelect">
+      <option value="#c80000">Rouge</option>
+      <option value="#0077cc">Bleu</option>
+      <option value="#009933">Vert</option>
+      <option value="#993399">Violet</option>
+      <option value="#ff9900">Orange</option>
+    </select>
   </div>
   
-  <!-- Formulaire de configuration -->
-  <form id="playerForm" class="team-form">
-    <h2>Nom et Couleurs de l'Équipe</h2>
-    <div class="form-row">
-      <input type="text" id="teamNameInput" placeholder="Entrez le nom de l'équipe" required>
-      <input type="color" id="teamTextColorInput" value="#FF7F00" title="Choisissez la couleur du texte">
-      <input type="color" id="teamBorderColorInput" value="#000000" title="Choisissez la couleur de la bordure">
-    </div>
-    <div class="form-row">
-      <label>Logo de l'équipe (facultatif): </label>
-      <input type="file" id="teamLogoInput" accept="image/*">
-    </div>
-    <div class="team-form">
-      <h2>Joueurs</h2>
-      <div id="playersContainer">
-        <!-- Génération des champs pour 12 joueurs -->
-      </div>
-    </div>
-    <div style="text-align:center;">
-      <button type="submit" class="validate-btn">
-        <i class="fa-solid fa-basketball"></i> Valider
-      </button>
-    </div>
-  </form>
-
-  <!-- Page des statistiques -->
-  <div class="stats-page" id="statsPage">
-    <div class="basket-icons">
-      <i class="fa-solid fa-basketball animated-icon"></i>
-      <i class="fa-solid fa-shoe-prints animated-icon"></i>
-      <i class="fa-solid fa-hand-back-fist animated-icon"></i>
-    </div>
-    <!-- Actions (icônes) -->
-    <div class="stats-actions">
-      <button id="previewBtn" title="Prévisualiser">
-        <i class="fa-solid fa-eye animated-icon"></i>
-      </button>
-      <button id="downloadBtn" title="Télécharger PDF">
-        <i class="fa-solid fa-download animated-icon"></i>
-      </button>
-      <button id="backBtn" title="Retour">
-        <i class="fa-solid fa-arrow-left animated-icon"></i>
-      </button>
-    </div>
-    <div class="team-stats">
-      <div class="players-container" id="playersStatsContainer"></div>
-    </div>
-  </div>
-
-  <!-- Modal de prévisualisation simplifiée -->
-  <div id="previewModal" class="modal">
-    <div class="modal-content">
-      <span class="close-modal" id="closeModal">&times;</span>
-      <h2>Aperçu des statistiques</h2>
-      <div class="team-stats">
-        <div class="players-container" id="playersPreviewContainer"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bouton scroll-to-top -->
-  <button class="scroll-to-top" id="scrollToTopBtn">
-    <i class="fa-solid fa-arrow-up"></i>
-  </button>
-
-  <!-- Footer -->
-  <footer>
-    by TIMITE CHECK BEN IDRISS
-  </footer>
-
   <script>
-    /* --- Gestion du spinner de chargement --- */
-    window.addEventListener("load", () => {
-      document.getElementById("spinner").style.display = "none";
-    });
-
-    /* --- Parallaxe sur les images de fond --- */
-    window.addEventListener("scroll", () => {
-      let scrollPos = window.pageYOffset;
-      // Ajustement de la position (les deux images se déplacent différemment)
-      document.getElementById("bg1").style.transform = `translateY(${scrollPos * 0.3}px) scale(1)`;
-      document.getElementById("bg2").style.transform = `translateY(${scrollPos * 0.2}px) scale(1)`;
-      // Vous pouvez également ajuster le filtre (ex. augmentation du flou lors du scroll)
-      // document.getElementById("bg1").style.filter = `blur(${scrollPos/500}px)`;
-    });
-
-    /* --- Paramètres globaux --- */
-    const numPlayers = 12;
-    const defaultImage = "https://via.placeholder.com/60?text=?";
-
-    /* --- Génération des champs pour chaque joueur --- */
-    function generatePlayerInputs(containerId) {
-      const container = document.getElementById(containerId);
-      for (let i = 0; i < numPlayers; i++) {
-        const row = document.createElement("div");
-        row.classList.add("form-row");
-        const nameInput = document.createElement("input");
-        nameInput.type = "text";
-        nameInput.placeholder = "Nom du joueur " + (i + 1);
-        nameInput.required = true;
-        nameInput.classList.add("player-name");
-        const imageInput = document.createElement("input");
-        imageInput.type = "file";
-        imageInput.accept = "image/*";
-        imageInput.classList.add("player-image");
-        row.appendChild(nameInput);
-        row.appendChild(imageInput);
-        container.appendChild(row);
-      }
-    }
-    generatePlayerInputs("playersContainer");
-
-    /* --- Lecture d'une image en Data URL --- */
-    function readImage(file) {
-      return new Promise((resolve) => {
-        if (!file) { resolve(null); }
-        else {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.readAsDataURL(file);
-        }
-      });
-    }
-
-    /* --- Gestion du formulaire --- */
-    document.getElementById("playerForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const teamName = document.getElementById("teamNameInput").value.trim();
-      const teamTextColor = document.getElementById("teamTextColorInput").value;
-      const teamBorderColor = document.getElementById("teamBorderColorInput").value;
-      const logoFile = document.getElementById("teamLogoInput").files[0];
-      const teamLogo = await readImage(logoFile);
-      const teamData = { 
-        teamName, 
-        teamTextColor, 
-        teamBorderColor,
-        logo: teamLogo,
-        players: [] 
-      };
-      const container = document.getElementById("playersContainer");
-      const rows = container.querySelectorAll(".form-row");
-      for (const row of rows) {
-        const name = row.querySelector(".player-name").value.trim();
-        const fileInput = row.querySelector(".player-image");
-        const file = fileInput.files[0];
-        const imageUrl = await readImage(file) || defaultImage;
-        teamData.players.push({ 
-          name, 
-          imageUrl, 
-          stats: { points: 0, rebonds: 0, passes: 0, contres: 0, inters: 0, faute: 0 }
-        });
-      }
-      document.getElementById("playerForm").style.display = "none";
-      document.getElementById("statsPage").style.display = "block";
-      const stickyTeamName = document.getElementById("stickyTeamName");
-      stickyTeamName.textContent = teamData.teamName;
-      stickyTeamName.style.color = teamTextColor;
-      stickyTeamName.style.borderBottom = `4px solid ${teamBorderColor}`;
-      if(teamData.logo) {
-        document.getElementById("logoContainer").innerHTML = `<img src="${teamData.logo}" alt="Logo de l'équipe">`;
-      }
-      renderStats(teamData);
-    });
-
-    /* --- Calcul des maximums --- */
-    function computeMaxStats(players) {
-      return {
-        maxPoints: Math.max(...players.map(p => p.stats.points)),
-        maxRebonds: Math.max(...players.map(p => p.stats.rebonds)),
-        maxPasses: Math.max(...players.map(p => p.stats.passes))
-      };
-    }
-
-    /* --- Création d'une fiche joueur (avec modification) --- */
-    function createPlayerCard(player, container, bestPlayer) {
-      const card = document.createElement("div");
-      card.classList.add("player-card");
-      if (player === bestPlayer) { card.classList.add("best-player"); }
-      const header = document.createElement("div");
-      header.classList.add("player-header");
-      const img = document.createElement("img");
-      img.src = player.imageUrl || defaultImage;
-      img.alt = player.name;
-      const nameElem = document.createElement("h3");
-      nameElem.textContent = player.name + (player.stats.faute === 5 ? " EXPULSER" : "");
-      header.appendChild(img);
-      header.appendChild(nameElem);
-      card.appendChild(header);
-      const statsDiv = document.createElement("div");
-      statsDiv.classList.add("stats");
-      const statList = [
-        { label: "Points", key: "points", multi: true },
-        { label: "Rebonds", key: "rebonds", multi: false },
-        { label: "Passes", key: "passes", multi: false },
-        { label: "Contres", key: "contres", multi: false },
-        { label: "Interceptions", key: "inters", multi: false }
-      ];
-      statList.forEach(stat => {
-        const statDiv = document.createElement("div");
-        statDiv.classList.add("stat");
-        const statLabel = document.createElement("span");
-        statLabel.textContent = stat.label + ": ";
-        statDiv.appendChild(statLabel);
-        const counterDiv = document.createElement("div");
-        counterDiv.classList.add("counter");
-        const minusBtn = document.createElement("button");
-        minusBtn.textContent = "–";
-        minusBtn.addEventListener("click", () => {
-          if (player.stats[stat.key] > 0) {
-            player.stats[stat.key]--;
-            statValue.textContent = player.stats[stat.key];
-            updateBestPlayerHighlight();
-          }
-        });
-        counterDiv.appendChild(minusBtn);
-        const statValue = document.createElement("span");
-        statValue.textContent = player.stats[stat.key];
-        counterDiv.appendChild(statValue);
-        if (stat.multi) {
-          const plus1 = document.createElement("button");
-          plus1.textContent = "+1";
-          plus1.addEventListener("click", () => {
-            player.stats[stat.key] += 1;
-            statValue.textContent = player.stats[stat.key];
-            updateBestPlayerHighlight();
-          });
-          counterDiv.appendChild(plus1);
-          const plus2 = document.createElement("button");
-          plus2.textContent = "+2";
-          plus2.classList.add("plus2");
-          plus2.addEventListener("click", () => {
-            player.stats[stat.key] += 2;
-            statValue.textContent = player.stats[stat.key];
-            updateBestPlayerHighlight();
-          });
-          counterDiv.appendChild(plus2);
-          const plus3 = document.createElement("button");
-          plus3.textContent = "+3";
-          plus3.classList.add("plus3");
-          plus3.addEventListener("click", () => {
-            player.stats[stat.key] += 3;
-            statValue.textContent = player.stats[stat.key];
-            updateBestPlayerHighlight();
-          });
-          counterDiv.appendChild(plus3);
-        } else {
-          const plus1 = document.createElement("button");
-          plus1.textContent = "+1";
-          plus1.addEventListener("click", () => {
-            player.stats[stat.key] += 1;
-            statValue.textContent = player.stats[stat.key];
-            updateBestPlayerHighlight();
-          });
-          counterDiv.appendChild(plus1);
-        }
-        statDiv.appendChild(counterDiv);
-        statsDiv.appendChild(statDiv);
-      });
-      const fauteDiv = document.createElement("div");
-      fauteDiv.classList.add("stat");
-      const fauteLabel = document.createElement("span");
-      fauteLabel.textContent = "Faute: ";
-      fauteDiv.appendChild(fauteLabel);
-      const faultContainer = document.createElement("div");
-      faultContainer.classList.add("faute-container");
-      for (let i = 0; i < 5; i++) {
-        const cb = document.createElement("input");
-        cb.type = "checkbox";
-        cb.classList.add("faute-cb");
-        cb.checked = (player.stats.faute > i);
-        cb.addEventListener("change", function() {
-          const checkboxes = faultContainer.querySelectorAll(".faute-cb");
-          let count = 0;
-          checkboxes.forEach(chk => { if (chk.checked) count++; });
-          player.stats.faute = count;
-          updateBestPlayerHighlight();
-        });
-        faultContainer.appendChild(cb);
-      }
-      fauteDiv.appendChild(faultContainer);
-      statsDiv.appendChild(fauteDiv);
-      card.appendChild(statsDiv);
-      container.appendChild(card);
-    }
-
-    /* --- Affichage des statistiques de l'équipe --- */
-    function renderStats(teamData) {
-      const container = document.getElementById("playersStatsContainer");
-      container.innerHTML = "";
-      const bestPlayer = determineBestPlayer(teamData.players);
-      teamData.players.forEach(player => { createPlayerCard(player, container, bestPlayer); });
-      window.teamFinalData = teamData;
-    }
-
-    /* --- Mise à jour de l'affichage --- */
-    function updateBestPlayerHighlight() {
-      const teamData = window.teamFinalData;
-      const container = document.getElementById("playersStatsContainer");
-      container.innerHTML = "";
-      const bestPlayer = determineBestPlayer(teamData.players);
-      teamData.players.forEach(player => { createPlayerCard(player, container, bestPlayer); });
-    }
-
-    /* --- Détermine le meilleur joueur --- */
-    function determineBestPlayer(players) {
-      return players.reduce((prev, curr) => prev.stats.points >= curr.stats.points ? prev : curr);
-    }
-
-    /* --- Création d'une fiche de prévisualisation simplifiée --- */
-    function createPreviewCard(player) {
-      const card = document.createElement("div");
-      card.classList.add("preview-card");
-      const header = document.createElement("div");
-      header.classList.add("player-header");
-      const img = document.createElement("img");
-      img.src = player.imageUrl || defaultImage;
-      img.alt = player.name;
-      header.appendChild(img);
-      const nameElem = document.createElement("h3");
-      nameElem.textContent = player.name + (player.stats.faute === 5 ? " EXPULSER" : "");
-      header.appendChild(nameElem);
-      card.appendChild(header);
-      const stats = document.createElement("div");
-      stats.classList.add("stat-values");
-      const statList = [
-        { label: "Points", key: "points" },
-        { label: "Rebonds", key: "rebonds" },
-        { label: "Passes", key: "passes" },
-        { label: "Contres", key: "contres" },
-        { label: "Interceptions", key: "inters" },
-        { label: "Faute", key: "faute" }
-      ];
-      statList.forEach(stat => {
-        const statElem = document.createElement("div");
-        statElem.classList.add("stat-value");
-        statElem.textContent = stat.label + ": " + player.stats[stat.key];
-        stats.appendChild(statElem);
-      });
-      card.appendChild(stats);
-      return card;
-    }
-
-    /* --- Bouton scroll-to-top --- */
-    const scrollBtn = document.getElementById("scrollToTopBtn");
-    scrollBtn.addEventListener("click", () => { window.scrollTo({ top: 0, behavior: "smooth" }); });
-
-    /* --- Bouton Retour --- */
-    document.getElementById("backBtn").addEventListener("click", () => {
-      document.getElementById("statsPage").style.display = "none";
-      document.getElementById("playerForm").style.display = "block";
-    });
-
-    /* --- Aperçu modal simplifié --- */
-    document.getElementById("previewBtn").addEventListener("click", () => {
-      const previewContainer = document.getElementById("playersPreviewContainer");
-      previewContainer.innerHTML = "";
-      const teamData = window.teamFinalData;
-      teamData.players.forEach(player => {
-        const card = createPreviewCard(player);
-        previewContainer.appendChild(card);
-      });
-      document.getElementById("previewModal").style.display = "block";
-    });
-    document.getElementById("closeModal").addEventListener("click", () => {
-      document.getElementById("previewModal").style.display = "none";
-    });
-    window.addEventListener("click", (event) => {
-      if (event.target == document.getElementById("previewModal")) {
-        document.getElementById("previewModal").style.display = "none";
-      }
-    });
-
-    /* --- Génération du PDF --- */
-    function downloadPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF('p', 'pt', 'a4');
-      const teamData = window.teamFinalData;
-      const margin = 40;
-      let y = margin;
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const colWidth = (pageWidth - margin * 2) / 2;
-      const imageW = 40, imageH = 40;
-      const cellHeight = 160;
-      const { maxPoints, maxRebonds, maxPasses } = computeMaxStats(teamData.players);
-      doc.setFontSize(18);
-      const hex = teamData.teamTextColor.replace("#", "");
-      const rColor = parseInt(hex.substring(0, 2), 16);
-      const gColor = parseInt(hex.substring(2, 4), 16);
-      const bColor = parseInt(hex.substring(4, 6), 16);
-      doc.setTextColor(rColor, gColor, bColor);
-      doc.text(teamData.teamName, pageWidth/2, y, { align: 'center' });
-      y += 40;
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-      for (let i = 0; i < teamData.players.length; i += 2) {
-        for (let col = 0; col < 2; col++) {
-          const index = i + col;
-          if (index >= teamData.players.length) break;
-          const player = teamData.players[index];
-          const currentX = margin + col * colWidth;
-          let currentY = y;
-          const centerX = currentX + (colWidth - imageW) / 2;
-          try {
-            doc.addImage(player.imageUrl, 'JPEG', centerX, currentY, imageW, imageH);
-          } catch (error) {
-            console.error("Erreur pour " + player.name, error);
-          }
-          currentY += imageH + 10;
-          const nameText = player.name + (player.stats.faute === 5 ? " EXPULSER" : "");
-          doc.text("Joueur: " + nameText, currentX + colWidth/2, currentY, { align: 'center' });
-          currentY += 15;
-          doc.text("Points: " + player.stats.points, currentX + colWidth/2, currentY, { align: 'center' });
-          currentY += 15;
-          doc.text("Rebonds: " + player.stats.rebonds, currentX + colWidth/2, currentY, { align: 'center' });
-          currentY += 15;
-          doc.text("Passes: " + player.stats.passes, currentX + colWidth/2, currentY, { align: 'center' });
-          currentY += 15;
-          doc.text("Contres: " + player.stats.contres, currentX + colWidth/2, currentY, { align: 'center' });
-          currentY += 15;
-          doc.text("Interceptions: " + player.stats.inters, currentX + colWidth/2, currentY, { align: 'center' });
-          currentY += 15;
-          doc.text("Faute: " + player.stats.faute, currentX + colWidth/2, currentY, { align: 'center' });
-          if (player.stats.points === maxPoints) {
-            doc.setDrawColor(255, 0, 0);
-            doc.setLineWidth(2);
-            doc.rect(currentX - 5, y - 5, colWidth + 10, cellHeight + 10);
-          }
-          if (player.stats.rebonds === maxRebonds) {
-            doc.setDrawColor(255, 165, 0);
-            doc.setLineWidth(2);
-            doc.rect(currentX - 10, y - 10, colWidth + 20, cellHeight + 20);
-          }
-          if (player.stats.passes === maxPasses) {
-            doc.setDrawColor(0, 0, 0);
-            doc.setLineWidth(2);
-            doc.rect(currentX - 15, y - 15, colWidth + 30, cellHeight + 30);
-          }
-        }
-        y += cellHeight + 10;
-        if (y > doc.internal.pageSize.getHeight() - margin - cellHeight && i + 2 < teamData.players.length) {
-          doc.addPage();
-          y = margin;
-        }
-      }
-      if (teamData.logo) {
-        const logoW = 80, logoH = 80;
-        const pageHeight = doc.internal.pageSize.getHeight();
-        const logoX = pageWidth - margin - logoW;
-        const logoY = pageHeight - margin - logoH;
-        try {
-          doc.addImage(teamData.logo, 'JPEG', logoX, logoY, logoW, logoH);
-        } catch (error) {
-          console.error("Erreur lors de l'ajout du logo", error);
-        }
-        doc.setFontSize(8);
-        doc.setTextColor(0, 0, 0);
-        const legendX = logoX - 10;
-        const legendY = logoY + logoH/2 - 12;
-        doc.text("Légende:", legendX, legendY, { align: 'right' });
-        doc.text("Points max: Rouge", legendX, legendY + 10, { align: 'right' });
-        doc.text("Rebonds max: Orange", legendX, legendY + 20, { align: 'right' });
-        doc.text("Passes max: Noir", legendX, legendY + 30, { align: 'right' });
-      }
-      doc.save(teamData.teamName + "_rapport.pdf");
-    }
-
-    /* --- Bascule mode sombre/jour --- */
-    const modeToggle = document.getElementById("modeToggle");
-    modeToggle.addEventListener("click", () => {
-      document.body.classList.toggle("dark-mode");
-      if(document.body.classList.contains("dark-mode")) {
-        modeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
-      } else {
-        modeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
-      }
+    // Affichage / Masquage du menu
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    menuToggle.addEventListener('click', () => {
+      navMenu.style.display = (navMenu.style.display === 'flex') ? 'none' : 'flex';
+      navMenu.style.flexDirection = 'column';
     });
     
-    /* --- Écouteur pour le bouton de téléchargement --- */
-    document.getElementById("downloadBtn").addEventListener("click", downloadPDF);
+    // Smooth scroll sur clic dans le menu
+    document.querySelectorAll('.nav-menu a').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+        navMenu.style.display = 'none';
+      });
+    });
+    
+    // Gestion du formulaire pour ouvrir WhatsApp avec les infos pré-remplies
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const nom = this.querySelector('input[name="nom"]').value;
+      const prenom = this.querySelector('input[name="prenom"]').value;
+      const numero = this.querySelector('input[name="numero"]').value;
+      const tarif = this.querySelector('select[name="tarif"]').value;
+      const message = `Nom: ${nom}%0APrénom: ${prenom}%0ANuméro: ${numero}%0ATarif: ${tarif}`;
+      const whatsappURL = `https://api.whatsapp.com/send?phone=0779379858&text=${message}`;
+      window.open(whatsappURL, '_blank');
+      this.reset();
+    });
+    
+    // Gestion des filtres pour la section Portfolio
+    const filterButtons = document.querySelectorAll('.portfolio-filters button');
+    const portfolioItems = document.querySelectorAll('.portfolio-item');
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const filter = button.getAttribute('data-filter');
+        portfolioItems.forEach(item => {
+          item.style.display = (item.getAttribute('data-category') === filter) ? 'block' : 'none';
+        });
+      });
+    });
+    
+    // Gestion de l'affichage de la description dans les cartes tarifs avec effet "shutter"
+    const toggleInfoButtons = document.querySelectorAll('.toggle-info');
+    toggleInfoButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.price-card');
+        card.classList.add('flash');
+        setTimeout(() => {
+          const moreInfo = btn.nextElementSibling;
+          moreInfo.style.display = (moreInfo.style.display === 'block') ? 'none' : 'block';
+          card.classList.remove('flash');
+        }, 500);
+      });
+    });
+    
+    // Slider de témoignages
+    const testimonials = document.querySelectorAll('.testimonial');
+    let currentTestimonial = 0;
+    setInterval(() => {
+      testimonials[currentTestimonial].classList.remove('active');
+      currentTestimonial = (currentTestimonial + 1) % testimonials.length;
+      testimonials[currentTestimonial].classList.add('active');
+    }, 4000); // Changement toutes les 4 secondes
+    
+    // Sélecteur de palette de couleurs
+    const colorSelect = document.getElementById('colorSelect');
+    colorSelect.addEventListener('change', function() {
+      const newColor = this.value;
+      document.documentElement.style.setProperty('--primary-color', newColor);
+      // Pour calculer une couleur plus foncée (hover) simple, on peut définir manuellement ou utiliser une librairie
+      // Ici nous utilisons quelques conditions simples :
+      let hoverColor = newColor;
+      if(newColor === "#c80000") hoverColor = "#a30000";
+      else if(newColor === "#0077cc") hoverColor = "#005fa3";
+      else if(newColor === "#009933") hoverColor = "#007a29";
+      else if(newColor === "#993399") hoverColor = "#7a267a";
+      else if(newColor === "#ff9900") hoverColor = "#cc7a00";
+      document.documentElement.style.setProperty('--primary-hover', hoverColor);
+    });
   </script>
 </body>
 </html>
