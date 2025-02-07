@@ -191,11 +191,14 @@
     .price-card h3 {
       margin-bottom: 10px;
     }
+    <!-- Mise à jour des prix en FCFA -->
     .price-card .price {
       font-size: 1.2rem;
       margin-bottom: 10px;
       color: var(--primary-color);
     }
+    /* Par exemple : Basic : 200 000 FCFA/session, Premium : 400 000 FCFA/session, VIP : 600 000 FCFA/session */
+    
     .price-card ul {
       list-style: none;
       margin-bottom: 10px;
@@ -412,9 +415,18 @@
       padding: 20px;
       font-style: italic;
       transition: opacity 0.5s ease-in-out;
+      position: relative;
     }
     .testimonial.active {
       display: block;
+    }
+    .testimonial i {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      font-size: 2rem;
+      color: var(--primary-color);
+      opacity: 0.6;
     }
     .testimonial p {
       margin-bottom: 10px;
@@ -444,7 +456,7 @@
     }
     
     /* ========================== */
-    /* Sélecteur de palette de couleurs */
+    /* Sélecteur de palette de couleurs transformé en icône avec animation */
     .color-picker {
       position: fixed;
       bottom: 20px;
@@ -455,16 +467,47 @@
       padding: 10px;
       border-radius: 5px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: transform 0.3s ease;
     }
-    .color-picker label {
-      font-size: 0.9rem;
-      margin-right: 5px;
-      color: var(--text-color);
+    .color-picker:hover {
+      transform: scale(1.1);
     }
-    .color-picker select {
-      padding: 5px;
+    .color-picker i {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      transition: transform 0.5s ease;
+    }
+    .color-picker.active i {
+      animation: rotate 0.5s ease forwards;
+    }
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    /* On cache par défaut la zone d'options */
+    .color-options {
+      display: none;
+      margin-top: 5px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .color-picker.active .color-options {
+      display: flex;
+      opacity: 1;
+    }
+    .color-option {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
       border: 1px solid #ccc;
-      border-radius: 3px;
+      transition: transform 0.3s ease;
+    }
+    .color-option:hover {
+      transform: scale(1.2);
     }
     
     /* ========================== */
@@ -517,7 +560,7 @@
       <div class="price-card">
         <i class="fas fa-camera"></i>
         <h3>Basic</h3>
-        <p class="price">200€/session</p>
+        <p class="price">200 000 FCFA/session</p>
         <ul>
           <li>2h de shooting</li>
           <li>20 photos retouchées</li>
@@ -532,7 +575,7 @@
       <div class="price-card">
         <i class="fas fa-video"></i>
         <h3>Premium</h3>
-        <p class="price">400€/session</p>
+        <p class="price">400 000 FCFA/session</p>
         <ul>
           <li>4h de shooting</li>
           <li>50 photos retouchées</li>
@@ -547,7 +590,7 @@
       <div class="price-card">
         <i class="fas fa-star"></i>
         <h3>VIP</h3>
-        <p class="price">600€/session</p>
+        <p class="price">600 000 FCFA/session</p>
         <ul>
           <li>Journée complète</li>
           <li>100+ photos retouchées</li>
@@ -566,7 +609,7 @@
     <h2>Portfolio</h2>
     <!-- Sous-menu des filtres -->
     <div class="portfolio-filters">
-      <!-- Option "Tous" : une seule vidéo, de taille réduite -->
+      <!-- Option "Tous" : la vidéo sera affichée par défaut -->
       <button data-filter="video"><i class="fas fa-video"></i> Tous</button>
       <button data-filter="studio"><i class="fas fa-portrait"></i> En Studio</button>
       <button data-filter="dehors"><i class="fas fa-tree"></i> Dehors</button>
@@ -679,37 +722,41 @@
     <div class="testimonial-slider">
       <!-- Témoignage 1 -->
       <div class="testimonial active">
+        <i class="fas fa-quote-left"></i>
         <p>"Un service exceptionnel, des photos magnifiques qui racontent une histoire !"</p>
         <div class="author">— M. Dupont</div>
       </div>
       <!-- Témoignage 2 -->
       <div class="testimonial">
+        <i class="fas fa-quote-left"></i>
         <p>"J'ai adoré l'expérience. L'équipe est professionnelle et passionnée."</p>
         <div class="author">— Mme Martin</div>
       </div>
       <!-- Témoignage 3 -->
       <div class="testimonial">
+        <i class="fas fa-quote-left"></i>
         <p>"Des clichés d'une qualité incroyable et une ambiance chaleureuse lors de la séance."</p>
         <div class="author">— M. Lemoine</div>
       </div>
       <!-- Témoignage 4 -->
       <div class="testimonial">
+        <i class="fas fa-quote-left"></i>
         <p>"Je recommande vivement pour immortaliser vos moments les plus précieux !"</p>
         <div class="author">— Mme Moreau</div>
       </div>
     </div>
   </section>
   
-  <!-- Sélecteur de palette de couleurs -->
-  <div class="color-picker">
-    <label for="colorSelect">Palette :</label>
-    <select id="colorSelect">
-      <option value="#c80000">Rouge</option>
-      <option value="#0077cc">Bleu</option>
-      <option value="#009933">Vert</option>
-      <option value="#993399">Violet</option>
-      <option value="#ff9900">Orange</option>
-    </select>
+  <!-- Sélecteur de palette de couleurs transformé en icône avec animation -->
+  <div class="color-picker" id="colorPicker">
+    <i class="fas fa-palette"></i>
+    <div class="color-options">
+      <span class="color-option" data-color="#c80000" style="background-color: #c80000;"></span>
+      <span class="color-option" data-color="#0077cc" style="background-color: #0077cc;"></span>
+      <span class="color-option" data-color="#009933" style="background-color: #009933;"></span>
+      <span class="color-option" data-color="#993399" style="background-color: #993399;"></span>
+      <span class="color-option" data-color="#ff9900" style="background-color: #ff9900;"></span>
+    </div>
   </div>
   
   <script>
@@ -730,7 +777,7 @@
       });
     });
     
-    // Gestion du formulaire pour ouvrir WhatsApp avec les infos pré-remplies
+    // Gestion du formulaire pour envoyer les informations via WhatsApp (numéro ivoirien)
     document.getElementById('contactForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const nom = this.querySelector('input[name="nom"]').value;
@@ -738,7 +785,8 @@
       const numero = this.querySelector('input[name="numero"]').value;
       const tarif = this.querySelector('select[name="tarif"]').value;
       const message = `Nom: ${nom}%0APrénom: ${prenom}%0ANuméro: ${numero}%0ATarif: ${tarif}`;
-      const whatsappURL = `https://api.whatsapp.com/send?phone=0779379858&text=${message}`;
+      // Utilisation du numéro ivoirien sans le "+"
+      const whatsappURL = `https://api.whatsapp.com/send?phone=2250779379858&text=${message}`;
       window.open(whatsappURL, '_blank');
       this.reset();
     });
@@ -752,6 +800,15 @@
         portfolioItems.forEach(item => {
           item.style.display = (item.getAttribute('data-category') === filter) ? 'block' : 'none';
         });
+      });
+    });
+    
+    // Au chargement de la page, afficher uniquement l'item de la catégorie "video" (option Tous)
+    window.addEventListener('load', () => {
+      portfolioItems.forEach(item => {
+        if(item.getAttribute('data-category') !== 'video'){
+          item.style.display = 'none';
+        }
       });
     });
     
@@ -779,20 +836,28 @@
       testimonials[currentTestimonial].classList.add('active');
     }, 4000); // Changement toutes les 4 secondes
     
-    // Sélecteur de palette de couleurs
-    const colorSelect = document.getElementById('colorSelect');
-    colorSelect.addEventListener('change', function() {
-      const newColor = this.value;
-      document.documentElement.style.setProperty('--primary-color', newColor);
-      // Pour calculer une couleur plus foncée (hover) simple, on peut définir manuellement ou utiliser une librairie
-      // Ici nous utilisons quelques conditions simples :
-      let hoverColor = newColor;
-      if(newColor === "#c80000") hoverColor = "#a30000";
-      else if(newColor === "#0077cc") hoverColor = "#005fa3";
-      else if(newColor === "#009933") hoverColor = "#007a29";
-      else if(newColor === "#993399") hoverColor = "#7a267a";
-      else if(newColor === "#ff9900") hoverColor = "#cc7a00";
-      document.documentElement.style.setProperty('--primary-hover', hoverColor);
+    // Sélecteur de palette de couleurs transformé en icône avec animation
+    const colorPicker = document.getElementById('colorPicker');
+    const colorOptions = document.querySelector('.color-options');
+    
+    colorPicker.addEventListener('click', () => {
+      colorPicker.classList.toggle('active');
+    });
+    
+    document.querySelectorAll('.color-option').forEach(option => {
+      option.addEventListener('click', (e) => {
+        // Empêcher la propagation afin que le clic ne bascule pas la classe "active" sur le container
+        e.stopPropagation();
+        const newColor = option.getAttribute('data-color');
+        document.documentElement.style.setProperty('--primary-color', newColor);
+        let hoverColor = newColor;
+        if(newColor === "#c80000") hoverColor = "#a30000";
+        else if(newColor === "#0077cc") hoverColor = "#005fa3";
+        else if(newColor === "#009933") hoverColor = "#007a29";
+        else if(newColor === "#993399") hoverColor = "#7a267a";
+        else if(newColor === "#ff9900") hoverColor = "#cc7a00";
+        document.documentElement.style.setProperty('--primary-hover', hoverColor);
+      });
     });
   </script>
 </body>

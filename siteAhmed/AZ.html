@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photographe Pro - Capturing Moments</title>
+  <!-- Importation des polices -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* ========================== */
+    /* Variables CSS pour la palette de couleurs */
+    :root {
+      --primary-color: #c80000;
+      --primary-hover: #a30000;
+      --secondary-color: #e60000;
+      --bg-light: #fafafa;
+      --bg-dark: #000;
+      --text-color: #333;
+      --text-inverse: #fff;
+    }
+    
+    /* ========================== */
+    /* Réinitialisation & Scroll Smooth */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Raleway', sans-serif;
+      background-color: #fff;
+      color: var(--text-color);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    h1, h2, h3 {
+      font-family: 'Playfair Display', serif;
+    }
+    
+    /* ========================== */
+    /* Logo toujours visible */
+    .logo {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 999;
+      width: 100px;
+      animation: slideDown 1s ease-in-out;
+    }
+    
+    /* ========================== */
+    /* Menu Hamburger */
+    .menu-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      cursor: pointer;
+      font-size: 1.8rem;
+      color: var(--text-inverse);
+      background-color: var(--primary-color);
+      border: none;
+      padding: 10px;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+    }
+    .menu-toggle:hover {
+      transform: scale(1.1);
+    }
+    .nav-menu {
+      position: fixed;
+      top: 70px;
+      right: 20px;
+      background-color: var(--primary-color);
+      border-radius: 5px;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      z-index: 990;
+    }
+    .nav-menu a {
+      color: var(--text-inverse);
+      text-decoration: none;
+      padding: 15px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      transition: background 0.3s, transform 0.3s;
+    }
+    .nav-menu a:last-child {
+      border-bottom: none;
+    }
+    .nav-menu a:hover {
+      background-color: var(--primary-hover);
+      transform: scale(1.05);
+    }
+    .nav-menu a i {
+      margin-right: 5px;
+      transition: transform 0.3s;
+    }
+    .nav-menu a:hover i {
+      transform: scale(1.2);
+    }
+    
+    /* ========================== */
+    /* Header / Accueil avec fondu & zoom */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)),
+                  url('photographer-bg.jpg') center/cover no-repeat;
+      /* Remplacez l'URL par votre image de fond */
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      animation: fadeZoom 1.5s ease-in-out;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(200, 0, 0, 0.4);
+    }
+    .header-content {
+      z-index: 1;
+      color: var(--text-inverse);
+      padding: 0 20px;
+      animation: slideUp 1.5s ease-in-out;
+    }
+    .header-content h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+    .header-content p {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+    .header-content blockquote {
+      font-style: italic;
+      font-size: 1.2rem;
+      margin-top: 20px;
+      border-left: 3px solid var(--text-inverse);
+      padding-left: 15px;
+    }
+    
+    /* ========================== */
+    /* Tarifs */
+    .pricing {
+      padding: 80px 20px;
+      background-color: #fff;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+    .pricing h2 {
+      margin-bottom: 40px;
+    }
+    .price-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .price-card {
+      background: #fafafa;
+      padding: 20px;
+      border: 2px solid var(--primary-color);
+      border-radius: 10px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .price-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 30px rgba(200, 0, 0, 0.2);
+    }
+    .price-card i {
+      font-size: 2rem;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      transition: transform 0.3s;
+    }
+    .price-card:hover i {
+      transform: scale(1.1);
+    }
+    .price-card h3 {
+      margin-bottom: 10px;
+    }
+    /* Mise à jour des prix en FCFA */
+    .price-card .price {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+    .price-card ul {
+      list-style: none;
+      margin-bottom: 10px;
+    }
+    .price-card ul li {
+      margin: 5px 0;
+    }
+    .price-card button {
+      background-color: var(--primary-color);
+      color: var(--text-inverse);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .price-card button i {
+      margin-right: 5px;
+    }
+    .price-card button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+    /* Animation "shutter" pour simuler le clic photo */
+    .price-card.flash {
+      animation: shutter 0.5s ease-out;
+    }
+    @keyframes shutter {
+      0% { filter: brightness(1); transform: scale(1); }
+      50% { filter: brightness(2); transform: scale(1.05); }
+      100% { filter: brightness(1); transform: scale(1); }
+    }
+    /* Affichage des infos en fondu */
+    .more-info {
+      display: none;
+      background-color: #f1f1f1;
+      color: var(--text-color);
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    /* ========================== */
+    /* Portfolio */
+    .portfolio {
+      padding: 80px 20px;
+      background-color: #f5f5f5;
+      animation: fadeIn 1s ease-in-out;
+    }
+    .portfolio h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .portfolio-filters {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .portfolio-filters button {
+      background-color: var(--primary-color);
+      color: var(--text-inverse);
+      border: none;
+      padding: 10px 20px;
+      margin: 0 5px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .portfolio-filters button:hover {
+      background-color: var(--primary-hover);
+      transform: scale(1.05);
+    }
+    .portfolio-filters button i {
+      margin-right: 5px;
+      transition: transform 0.3s;
+    }
+    .portfolio-filters button:hover i {
+      transform: scale(1.2);
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .portfolio-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      background: var(--bg-dark);
+      /* Par défaut, Studio & Dehors en format carré */
+      aspect-ratio: 1 / 1;
+      transition: transform 0.3s;
+    }
+    /* Option "Tous" : vidéo de taille réduite */
+    .portfolio-item[data-category="video"] {
+      aspect-ratio: 4 / 3;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    /* Option Événement : format paysage réduit */
+    .portfolio-item[data-category="evenement"] {
+      aspect-ratio: 16 / 9;
+    }
+    /* Diaporama pour Studio / Dehors */
+    .portfolio-item .slideshow {
+      display: flex;
+      width: 300%; /* 3 images */
+      height: 100%;
+      transition: transform 0.5s ease-in-out;
+    }
+    .portfolio-item .slideshow img {
+      width: calc(100% / 3);
+      height: 100%;
+      object-fit: cover;
+    }
+    .portfolio-item:hover .slideshow {
+      animation: slide 3s infinite;
+    }
+    /* Pour items simples (vidéo ou image statique) */
+    .portfolio-item img,
+    .portfolio-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .portfolio-item:hover img,
+    .portfolio-item:hover video {
+      transform: scale(1.05);
+    }
+    @keyframes slide {
+      0%   { transform: translateX(0%); }
+      33%  { transform: translateX(-33.33%); }
+      66%  { transform: translateX(-66.66%); }
+      100% { transform: translateX(0%); }
+    }
+    
+    /* ========================== */
+    /* Me Contacter */
+    .contact {
+      padding: 80px 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: var(--text-inverse);
+      animation: fadeIn 1s ease-in-out;
+    }
+    .contact h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .contact-form {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      animation: slideUp 1s ease-in-out;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    input, select {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid var(--text-inverse);
+      border-radius: 5px;
+      margin-top: 5px;
+      background: transparent;
+      color: var(--text-inverse);
+    }
+    ::placeholder {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    button.submit-btn {
+      background-color: var(--text-inverse);
+      color: var(--primary-color);
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.3s;
+    }
+    button.submit-btn i {
+      margin-right: 5px;
+    }
+    button.submit-btn:hover {
+      background-color: #eee;
+      transform: translateY(-2px);
+    }
+    
+    /* ========================== */
+    /* Vos Avis - Témoignages */
+    .testimonials {
+      padding: 80px 20px;
+      background-color: var(--bg-light);
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+    .testimonials h2 {
+      margin-bottom: 40px;
+    }
+    .testimonial-slider {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .testimonial {
+      display: none;
+      padding: 20px;
+      font-style: italic;
+      transition: opacity 0.5s ease-in-out;
+      position: relative;
+    }
+    .testimonial.active {
+      display: block;
+    }
+    .testimonial i {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      font-size: 2rem;
+      color: var(--primary-color);
+      opacity: 0.6;
+    }
+    .testimonial p {
+      margin-bottom: 10px;
+    }
+    .testimonial .author {
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    /* ========================== */
+    /* Animations globales */
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes slideUp {
+      0% { transform: translateY(50px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes slideDown {
+      0% { transform: translateY(-50px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes fadeZoom {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    
+    /* ========================== */
+    /* Sélecteur de palette de couleurs transformé en icône avec animation */
+    .color-picker {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1001;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .color-picker:hover {
+      transform: scale(1.1);
+    }
+    .color-picker i {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      transition: transform 0.5s ease;
+    }
+    .color-picker.active i {
+      animation: rotate 0.5s ease forwards;
+    }
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    /* On cache par défaut la zone d'options */
+    .color-options {
+      display: none;
+      margin-top: 5px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .color-picker.active .color-options {
+      display: flex;
+      opacity: 1;
+    }
+    .color-option {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      transition: transform 0.3s ease;
+    }
+    .color-option:hover {
+      transform: scale(1.2);
+    }
+    
+    /* ========================== */
+    /* Lightbox - affichage en plein écran d'une image */
+    .lightbox {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.9);
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox-content {
+      margin: auto;
+      display: block;
+      max-width: 90%;
+      max-height: 90%;
+    }
+    .lightbox .close {
+      position: absolute;
+      top: 20px;
+      right: 35px;
+      color: #fff;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .lightbox .close:hover {
+      color: #bbb;
+    }
+    
+    /* ========================== */
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .price-cards {
+        grid-template-columns: 1fr;
+      }
+      .logo {
+        width: 80px;
+      }
+      .header-content h1 {
+        font-size: 2.5rem;
+      }
+      .header-content p, 
+      .header-content blockquote {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Icône Menu -->
+  <button class="menu-toggle"><i class="fas fa-ellipsis-v"></i></button>
+  <nav class="nav-menu">
+    <a href="#home"><i class="fas fa-home"></i> Accueil</a>
+    <a href="#pricing"><i class="fas fa-tags"></i> Tarifs</a>
+    <a href="#portfolio"><i class="fas fa-images"></i> Portfolio</a>
+    <a href="#contact"><i class="fas fa-envelope"></i> Me Contacter</a>
+  </nav>
+  
+  <!-- Logo toujours visible -->
+  <img src="images/logo design - logo - logos - logo designs - logo designer - logos design - logo designing.jpg" alt="Logo Photographe" class="logo">  <!-- Remplacez "logo.png" par l'URL de votre logo -->
+  
+  <!-- Header / Accueil -->
+  <header class="header" id="home">
+    <div class="header-content">
+      <h1>Photographe Professionnel</h1>
+      <p>Capturer vos moments précieux</p>
+      <blockquote>"La photographie, c'est l'art de saisir l'instant, de figer l'émotion et de raconter une histoire en une image."</blockquote>
+      <!-- Vous pouvez ajouter ici d'autres images ou vidéos -->
+    </div>
+  </header>
+  
+  <!-- Tarifs -->
+  <section class="pricing" id="pricing">
+    <h2>Nos Tarifs</h2>
+    <div class="price-cards">
+      <!-- Carte Basic -->
+      <div class="price-card">
+        <i class="fas fa-camera"></i>
+        <h3>Basic</h3>
+        <p class="price">200 000 FCFA/session</p>
+        <ul>
+          <li>2h de shooting</li>
+          <li>20 photos retouchées</li>
+          <li>Livraison numérique</li>
+        </ul>
+        <button class="toggle-info"><i class="fas fa-info-circle"></i> En savoir plus</button>
+        <div class="more-info">
+          <p>La formule Basic vous offre l'essentiel pour capturer vos moments en toute simplicité.</p>
+        </div>
+      </div>
+      <!-- Carte Premium -->
+      <div class="price-card">
+        <i class="fas fa-video"></i>
+        <h3>Premium</h3>
+        <p class="price">400 000 FCFA/session</p>
+        <ul>
+          <li>4h de shooting</li>
+          <li>50 photos retouchées</li>
+          <li>1 vidéo montée</li>
+        </ul>
+        <button class="toggle-info"><i class="fas fa-info-circle"></i> En savoir plus</button>
+        <div class="more-info">
+          <p>La formule Premium inclut une séance prolongée avec plus de créativité et un montage vidéo personnalisé.</p>
+        </div>
+      </div>
+      <!-- Carte VIP -->
+      <div class="price-card">
+        <i class="fas fa-star"></i>
+        <h3>VIP</h3>
+        <p class="price">600 000 FCFA/session</p>
+        <ul>
+          <li>Journée complète</li>
+          <li>100+ photos retouchées</li>
+          <li>Vidéo professionnelle</li>
+        </ul>
+        <button class="toggle-info"><i class="fas fa-info-circle"></i> En savoir plus</button>
+        <div class="more-info">
+          <p>La formule VIP vous offre une expérience complète pour immortaliser chaque instant d'une journée exceptionnelle.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Portfolio -->
+  <section class="portfolio" id="portfolio">
+    <h2>Portfolio</h2>
+    <!-- Sous-menu des filtres -->
+    <div class="portfolio-filters">
+      <!-- Option "Tous" : la vidéo sera affichée par défaut -->
+      <button data-filter="video"><i class="fas fa-video"></i> Tous</button>
+      <button data-filter="studio"><i class="fas fa-portrait"></i> En Studio</button>
+      <button data-filter="dehors"><i class="fas fa-tree"></i> Dehors</button>
+      <button data-filter="evenement"><i class="fas fa-calendar-alt"></i> Événement</button>
+    </div>
+    <div class="grid-container">
+      <!-- Item "Tous" (vidéo) -->
+      <div class="portfolio-item" data-category="video">
+        <video controls>
+          <source src="images/Wedding Video Trailer - Wedding Day In Cinematic Look.mp4" type="video/mp4">
+          Votre navigateur ne supporte pas la vidéo.
+        </video>
+      </div>
+      <!-- Items En Studio (diaporama) -->
+      <div class="portfolio-item" data-category="studio">
+        <div class="slideshow">
+          <img src="images/61b3659b-ba98-4c0c-965d-f25b2d29b2e2.jpg" alt="Studio 1">
+          <img src="images/e48b8206-c6a7-490a-af83-579094eb4dfc.jpg" alt="Studio 1">
+          <img src="images/f7e91340-9232-490c-9de5-59240ef2078b.jpg" alt="Studio 1">
+        </div>
+      </div>
+      <div class="portfolio-item" data-category="studio">
+        <div class="slideshow">
+          <img src="images/P E T E T H O M P S O N photography.jpg" alt="Studio 2">
+          <img src="images/Photo by Joachim Pressl on Unsplash.jpg" alt="Studio 2">
+          <img src="images/Photographie hawaïenne du coucher de soleil.jpg" alt="Studio 2">
+        </div>
+      </div>
+      <div class="portfolio-item" data-category="studio">
+        <div class="slideshow">
+          <img src="images/61b3659b-ba98-4c0c-965d-f25b2d29b2e2.jpg" alt="Studio 3">
+          <img src="images/f7e91340-9232-490c-9de5-59240ef2078b.jpg" alt="Studio 3">
+          <img src="images/Pin on Wallpapers.jpg" alt="Studio 3">
+        </div>
+      </div>
+      <div class="portfolio-item" data-category="studio">
+        <div class="slideshow">
+          <img src="images/e48b8206-c6a7-490a-af83-579094eb4dfc.jpg" alt="Studio 4">
+          <img src="images/Polina Washington in Saint Petersburg, Russian Federation.jpg" alt="Studio 4">
+          <img src="images/Photo by Joachim Pressl on Unsplash.jpg" alt="Studio 4">
+        </div>
+      </div>
+      <!-- Items Dehors (diaporama) -->
+      <div class="portfolio-item" data-category="dehors">
+        <div class="slideshow">
+          <img src="dehors1-1.jpg" alt="Dehors 1">
+          <img src="dehors1-2.jpg" alt="Dehors 1">
+          <img src="dehors1-3.jpg" alt="Dehors 1">
+        </div>
+      </div>
+      <div class="portfolio-item" data-category="dehors">
+        <div class="slideshow">
+          <img src="dehors2-1.jpg" alt="Dehors 2">
+          <img src="dehors2-2.jpg" alt="Dehors 2">
+          <img src="dehors2-3.jpg" alt="Dehors 2">
+        </div>
+      </div>
+      <div class="portfolio-item" data-category="dehors">
+        <div class="slideshow">
+          <img src="dehors3-1.jpg" alt="Dehors 3">
+          <img src="dehors3-2.jpg" alt="Dehors 3">
+          <img src="dehors3-3.jpg" alt="Dehors 3">
+        </div>
+      </div>
+      <div class="portfolio-item" data-category="dehors">
+        <div class="slideshow">
+          <img src="dehors4-1.jpg" alt="Dehors 4">
+          <img src="dehors4-2.jpg" alt="Dehors 4">
+          <img src="dehors4-3.jpg" alt="Dehors 4">
+        </div>
+      </div>
+      <!-- Items Événement (format paysage réduit) -->
+      <div class="portfolio-item" data-category="evenement">
+        <img src="images/Photo by Joachim Pressl on Unsplash.jpg" alt="Événement 1">
+      </div>
+      <div class="portfolio-item" data-category="evenement">
+        <img src="images/Polina Washington in Saint Petersburg, Russian Federation.jpg" alt="Événement 2">
+      </div>
+    </div>
+  </section>
+  
+  <!-- Me Contacter -->
+  <section class="contact" id="contact">
+    <h2>Me Contacter</h2>
+    <form class="contact-form" id="contactForm">
+      <div class="form-group">
+        <input type="text" name="nom" placeholder="Nom" required>
+      </div>
+      <div class="form-group">
+        <input type="text" name="prenom" placeholder="Prénom" required>
+      </div>
+      <div class="form-group">
+        <input type="tel" name="numero" placeholder="Numéro à contacter" required>
+      </div>
+      <div class="form-group">
+        <select name="tarif" required>
+          <option value="">Choisir un tarif</option>
+          <option>Basic</option>
+          <option>Premium</option>
+          <option>VIP</option>
+        </select>
+      </div>
+      <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Envoyer</button>
+    </form>
+  </section>
+  
+  <!-- Vos Avis - Témoignages -->
+  <section class="testimonials" id="testimonials">
+    <h2>Vos Avis</h2>
+    <div class="testimonial-slider">
+      <!-- Témoignage 1 -->
+      <div class="testimonial active">
+        <i class="fas fa-quote-left"></i>
+        <p>"Un service exceptionnel, des photos magnifiques qui racontent une histoire !"</p>
+        <div class="author">— M. Dupont</div>
+      </div>
+      <!-- Témoignage 2 -->
+      <div class="testimonial">
+        <i class="fas fa-quote-left"></i>
+        <p>"J'ai adoré l'expérience. L'équipe est professionnelle et passionnée."</p>
+        <div class="author">— Mme Martin</div>
+      </div>
+      <!-- Témoignage 3 -->
+      <div class="testimonial">
+        <i class="fas fa-quote-left"></i>
+        <p>"Des clichés d'une qualité incroyable et une ambiance chaleureuse lors de la séance."</p>
+        <div class="author">— M. Lemoine</div>
+      </div>
+      <!-- Témoignage 4 -->
+      <div class="testimonial">
+        <i class="fas fa-quote-left"></i>
+        <p>"Je recommande vivement pour immortaliser vos moments les plus précieux !"</p>
+        <div class="author">— Mme Moreau</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Sélecteur de palette de couleurs transformé en icône avec animation -->
+  <div class="color-picker" id="colorPicker">
+    <i class="fas fa-palette"></i>
+    <div class="color-options">
+      <span class="color-option" data-color="#c80000" style="background-color: #c80000;"></span>
+      <span class="color-option" data-color="#0077cc" style="background-color: #0077cc;"></span>
+      <span class="color-option" data-color="#009933" style="background-color: #009933;"></span>
+      <span class="color-option" data-color="#993399" style="background-color: #993399;"></span>
+      <span class="color-option" data-color="#ff9900" style="background-color: #ff9900;"></span>
+    </div>
+  </div>
+  
+  <!-- Lightbox : Affichage en plein écran d'une image -->
+  <div id="lightbox" class="lightbox">
+    <span class="close">&times;</span>
+    <img class="lightbox-content" id="lightbox-img" alt="Image agrandie">
+  </div>
+  
+  <script>
+    // Affichage / Masquage du menu
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    menuToggle.addEventListener('click', () => {
+      navMenu.style.display = (navMenu.style.display === 'flex') ? 'none' : 'flex';
+      navMenu.style.flexDirection = 'column';
+    });
+    
+    // Smooth scroll sur clic dans le menu
+    document.querySelectorAll('.nav-menu a').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+        navMenu.style.display = 'none';
+      });
+    });
+    
+    // Gestion du formulaire pour créer et télécharger un fichier .txt nommé "recu.txt"
+    // dont le contenu inclut la date, puis l'envoyer via WhatsApp.
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const nom = this.querySelector('input[name="nom"]').value;
+      const prenom = this.querySelector('input[name="prenom"]').value;
+      const numero = this.querySelector('input[name="numero"]').value;
+      const tarif = this.querySelector('select[name="tarif"]').value;
+      
+      // Récupération de la date actuelle formatée en français
+      const now = new Date();
+      const formattedDate = now.toLocaleString('fr-FR');
+      
+      // Construction du contenu du fichier en incluant la date
+      const content = `Date : ${formattedDate}\nNom : ${nom}\nPrénom : ${prenom}\nNuméro : ${numero}\nTarif : ${tarif}`;
+      
+      // Création d'un objet Blob contenant le texte
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      
+      // Création d'un lien de téléchargement et déclenchement du téléchargement
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'recu.txt';  // Nom du fichier modifié ici
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Envoi des informations sur WhatsApp via un lien prérempli
+      // Remplacez '1234567890' par le numéro WhatsApp (avec indicatif pays, ex. 33123456789 pour la France)
+      const whatsappNumber = '2250779379858';
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=` + encodeURIComponent(content);
+      window.open(whatsappUrl, '_blank');
+      
+      // Réinitialisation du formulaire
+      this.reset();
+    });
+    
+    // Gestion des filtres pour la section Portfolio
+    const filterButtons = document.querySelectorAll('.portfolio-filters button');
+    const portfolioItems = document.querySelectorAll('.portfolio-item');
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const filter = button.getAttribute('data-filter');
+        portfolioItems.forEach(item => {
+          item.style.display = (item.getAttribute('data-category') === filter) ? 'block' : 'none';
+        });
+      });
+    });
+    
+    // Au chargement de la page, afficher uniquement l'item de la catégorie "video" (option Tous)
+    window.addEventListener('load', () => {
+      portfolioItems.forEach(item => {
+        if(item.getAttribute('data-category') !== 'video'){
+          item.style.display = 'none';
+        }
+      });
+    });
+    
+    // Gestion de l'affichage de la description dans les cartes tarifs avec effet "shutter"
+    const toggleInfoButtons = document.querySelectorAll('.toggle-info');
+    toggleInfoButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.price-card');
+        card.classList.add('flash');
+        setTimeout(() => {
+          const moreInfo = btn.nextElementSibling;
+          moreInfo.style.display = (moreInfo.style.display === 'block') ? 'none' : 'block';
+          card.classList.remove('flash');
+        }, 500);
+      });
+    });
+    
+    // Slider de témoignages
+    const testimonials = document.querySelectorAll('.testimonial');
+    let currentTestimonial = 0;
+    setInterval(() => {
+      testimonials[currentTestimonial].classList.remove('active');
+      currentTestimonial = (currentTestimonial + 1) % testimonials.length;
+      testimonials[currentTestimonial].classList.add('active');
+    }, 4000); // Changement toutes les 4 secondes
+    
+    // Sélecteur de palette de couleurs transformé en icône avec animation
+    const colorPicker = document.getElementById('colorPicker');
+    const colorOptions = document.querySelector('.color-options');
+    colorPicker.addEventListener('click', () => {
+      colorPicker.classList.toggle('active');
+    });
+    document.querySelectorAll('.color-option').forEach(option => {
+      option.addEventListener('click', (e) => {
+        // Empêcher la propagation pour ne pas fermer le sélecteur
+        e.stopPropagation();
+        const newColor = option.getAttribute('data-color');
+        document.documentElement.style.setProperty('--primary-color', newColor);
+        let hoverColor = newColor;
+        if(newColor === "#c80000") hoverColor = "#a30000";
+        else if(newColor === "#0077cc") hoverColor = "#005fa3";
+        else if(newColor === "#009933") hoverColor = "#007a29";
+        else if(newColor === "#993399") hoverColor = "#7a267a";
+        else if(newColor === "#ff9900") hoverColor = "#cc7a00";
+        document.documentElement.style.setProperty('--primary-hover', hoverColor);
+      });
+    });
+    
+    // Lightbox : Afficher l'image en plein écran lorsqu'on clique dessus
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const closeBtn = document.querySelector('.lightbox .close');
+    
+    // Ajouter un événement sur toutes les images de la section Portfolio
+    document.querySelectorAll('.portfolio-item img').forEach(img => {
+      img.addEventListener('click', () => {
+        lightbox.style.display = 'flex';
+        lightboxImg.src = img.src;
+      });
+    });
+    
+    // Fermer la lightbox lorsqu'on clique sur la croix ou hors de l'image
+    closeBtn.addEventListener('click', () => {
+      lightbox.style.display = 'none';
+    });
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) {
+        lightbox.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
