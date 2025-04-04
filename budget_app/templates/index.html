@@ -1,0 +1,107 @@
+<!-- templates/index.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="dashboard">
+  <div class="card">
+    <h2>Revenus Mensuels</h2>
+    <p>{{ total_income }} FCFA</p>
+  </div>
+  <div class="card">
+    <h2>Dépenses Variables</h2>
+    <p>{{ total_expenses }} FCFA</p>
+  </div>
+  <div class="card">
+    <h2>Dépenses Fixes (Mensuel)</h2>
+    <p>{{ total_fixed }} FCFA</p>
+  </div>
+  <div class="card">
+    <h2>Solde Net</h2>
+    <p>{{ solde }} FCFA<br>
+       ({{ solde_usd }} USD / {{ solde_eur }} EUR)</p>
+  </div>
+</section>
+
+<section class="transactions">
+  <h2>Transactions Récentes</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Catégorie</th>
+        <th>Description</th>
+        <th>Montant (FCFA)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in transactions %}
+      <tr>
+        <td>{{ t.date }}</td>
+        <td>{{ t.category }}</td>
+        <td>{{ t.description }}</td>
+        <td>{{ t.amount|round(0, 'floor') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="transactions">
+  <h2>Revenus Récents</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Montant (FCFA)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in incomes %}
+      <tr>
+        <td>{{ i.date }}</td>
+        <td>{{ i.amount|round(0, 'floor') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="chart-section">
+  <h2>Répartition des Dépenses Variables</h2>
+  <canvas id="expensesChart"></canvas>
+</section>
+
+<script>
+  // Agrégation par catégorie pour le graphique des dépenses variables
+  const transactions = [
+    {% for t in transactions %}
+    { category: "{{ t.category }}", amount: {{ t.amount }} },
+    {% endfor %}
+  ];
+  let categoryTotals = {};
+  transactions.forEach(t => {
+      categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
+  });
+  const labels = Object.keys(categoryTotals);
+  const data = Object.values(categoryTotals);
+  const ctx = document.getElementById('expensesChart').getContext('2d');
+  const expensesChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+          labels: labels,
+          datasets: [{
+              data: data,
+              backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#f39c12']
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+              legend: { position: 'bottom' },
+              title: { display: true, text: 'Répartition des Dépenses Variables' }
+          }
+      }
+  });
+</script>
+{% endblock %}

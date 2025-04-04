@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Ajouter une Dépense Fixe Quotidienne</h2>
+<form method="post">
+  <label for="amount">Montant Quotidien (FCFA) :</label>
+  <input type="number" step="0.01" id="amount" name="amount" required>
+  
+  <label for="description">Description :</label>
+  <input type="text" id="description" name="description" placeholder="Ex: Abonnement, etc.">
+  
+  <label for="date">Date (ex: 2025-01-01 pour le début du mois) :</label>
+  <input type="date" id="date" name="date" required>
+  
+  <button type="submit">Ajouter la Dépense Fixe</button>
+</form>
+{% endblock %}

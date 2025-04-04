@@ -1,0 +1,38 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion Budgétaire</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- On utilise Chart.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Gestion Budgétaire</h1>
+    <nav>
+      <a href="{{ url_for('index') }}">Tableau de bord</a>
+      <a href="{{ url_for('add_expense') }}">Ajouter Dépense</a>
+      <a href="{{ url_for('add_income') }}">Ajouter Revenu</a>
+      <a href="{{ url_for('add_fixed_expense') }}">Ajouter Dépense Fixe</a>
+    </nav>
+  </header>
+  <div class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flashes">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+  <footer>
+    <p>&copy; 2025 Gestion Budgétaire</p>
+  </footer>
+</body>
+</html>

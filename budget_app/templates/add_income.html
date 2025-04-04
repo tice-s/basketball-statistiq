@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Ajouter un Revenu Mensuel</h2>
+<form method="post">
+  <label for="amount">Montant (FCFA) :</label>
+  <input type="number" step="0.01" id="amount" name="amount" required>
+  
+  <label for="date">Date (ex: 2025-01-01 pour janvier) :</label>
+  <input type="date" id="date" name="date" required>
+  
+  <button type="submit">Ajouter le Revenu</button>
+</form>
+{% endblock %}
